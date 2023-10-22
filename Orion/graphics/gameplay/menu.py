@@ -1,7 +1,6 @@
 import pygame
 import sys
-# from .Stage import *
-from .battle import Game
+from .battle import Battle
 from icecream import ic
 
 class Beranda:
@@ -16,7 +15,7 @@ class Beranda:
         self.width_lvl = 0
         self.path = "Beranda"
         self.clock = pygame.time.Clock()
-        self.game = Game(self.screen, self.screen_width, self.screen_height)
+        self.battle = Battle(self.screen, self.screen_width, self.screen_height)
     
     def button(self,color,size,color_hover,text,pos_x,pos_y,text_color='black',text_color_hover="white",action=None,parameters=[]):
         font = pygame.font.Font(None,24)
@@ -27,9 +26,9 @@ class Beranda:
             pygame.draw.rect(self.screen,color_hover,(pos_x,pos_y,size[0],size[1]),border_radius=10)
             if mouse_click[0] == 1 and action is not None:
                 for i in range(len(action)):
-                    ic(action[i].__name__,*parameters[i])
-                    ic(self.path)
-                    print("\n")
+                    # ic(action[i].__name__,*parameters[i])
+                    # ic(self.path)
+                    # print("\n")
                     if parameters == []:
                         action[i]()
                     else:
@@ -60,14 +59,12 @@ class Beranda:
         self.width_lvl = width
 
         # ic(self.path)
-
-        self.screen.fill((0,0,0))
         if self.path == "Beranda":
             self.views_Beranda(color=color,width=width,height=height)
         elif self.path == "Beranda/Stage":
             self.views_menu_lvl()
         elif self.path == "Battle":
-            self.game.run()
+            self.battle.run()
         else:
             self.views_Beranda(color=color,width=width,height=height)
             

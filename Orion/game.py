@@ -1,5 +1,5 @@
 import pygame
-import keyboard
+from icecream import ic
 import os
 from graphics.gameplay.menu import Beranda
 
@@ -10,9 +10,9 @@ class Game:
         WINDOW_INFO_SIZE = pygame.display.Info()
 
         #elemen jendela
-        self.WIDTH = WINDOW_INFO_SIZE.current_w
-        self.HEIGHT = WINDOW_INFO_SIZE.current_h
-        self.WINDOW_SIZE = (self.WIDTH - 10,self.HEIGHT-50)
+        self.WIDTH = WINDOW_INFO_SIZE.current_w - 10
+        self.HEIGHT = WINDOW_INFO_SIZE.current_h - 60
+        self.WINDOW_SIZE = (self.WIDTH,self.HEIGHT)
         self.set_background = 'black'
         self.functions = []
 
@@ -33,8 +33,13 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                    
+            
+            clock.tick(60)
             pygame.display.update()
+
+            # Cek apa bila fps drop
+            if clock.get_fps() < 30:
+                ic(clock.get_fps(), clock.get_time())
         pygame.quit()
 
     def elemenGame(self):
@@ -42,5 +47,7 @@ class Game:
             func()
 
     set_function = lambda self,func :self.functions.append(func)
+
+
 game = Game()
 game.rendering()

@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
 
         # Mendapatkan path file gambar dengan modul os
         image_path = "D:\\2023\\Semester 3\\Grafika Komputer\\Orion\\graphics\\gameplay\\Gartin.gif"
-
+        self.basic_attack_path = "D:\\2023\\Semester 3\\Grafika Komputer\\Orion\\graphics\\gameplay\\bullet.png"
         # Load player image and get its rect
         image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(image, (50, 50))
@@ -74,9 +74,6 @@ class Player(pygame.sprite.Sprite):
         # Keep player within the screen boundaries
         self.rect.x = max(0, min(self.rect.x, screen_width - self.rect.width))
         self.rect.y = max(0, min(self.rect.y, screen_height - self.rect.height))
-
-        # Clear the screen
-        self.screen.fill((0, 0, 0))
 
         # Draw player
         self.screen.blit(self.image, self.rect)
