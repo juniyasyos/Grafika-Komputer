@@ -19,10 +19,12 @@ class Game:
         # navigasi keyboard jendela
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE,pygame.RESIZABLE)
         pygame.display.set_caption("Orion")
-        self.mainMenu = Beranda(self.screen)
+        self.mainMenu = Beranda(self.screen, self.WIDTH, self.HEIGHT)
     
     def rendering(self):
         running = True
+        clock = pygame.time.Clock()
+
         while running:
             #Logic Game
             self.screen.fill(self.set_background)
