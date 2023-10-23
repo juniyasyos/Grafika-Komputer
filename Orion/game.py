@@ -34,7 +34,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
             
-            clock.tick(60)
+            clock.tick(70)
             pygame.display.update()
 
             # Cek apa bila fps drop

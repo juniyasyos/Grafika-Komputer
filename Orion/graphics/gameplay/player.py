@@ -7,8 +7,15 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # Mendapatkan path file gambar dengan modul os
-        image_path = "D:\\2023\\Semester 3\\Grafika Komputer\\Orion\\graphics\\gameplay\\Gartin.gif"
-        self.basic_attack_path = "D:\\2023\\Semester 3\\Grafika Komputer\\Orion\\graphics\\gameplay\\bullet.png"
+                # Dapatkan direktori script saat ini
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+
+        # Buat jalur file untuk gambar
+        image_path = os.path.join(current_directory,"Gartin.gif")
+
+        # Buat jalur file untuk basic attack
+        self.basic_attack_path = os.path.join(current_directory,"bullet.png")
+
         # Load player image and get its rect
         image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(image, (50, 50))
@@ -26,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.max_health = 100
         self.score = 0
+        self.damage = 0
 
         self.skill_cooldown_timer = 0  # Waktu countdown cooldown skill
         self.skill_cooldown_text = ""  # Teks countdown
@@ -36,6 +44,9 @@ class Player(pygame.sprite.Sprite):
             "speed_boost": {"active": False, "cooldown": 0, "duration": 5, "last_used": 0},
             "shield": {"active": False, "cooldown": 0, "duration": 10, "last_used": 0},
         }
+
+    def get_damage(self, damage=10):
+        return self.damage + damage
 
     def handle_events(self, speed):
         keys = pygame.key.get_pressed()
