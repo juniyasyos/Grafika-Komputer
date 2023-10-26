@@ -6,15 +6,14 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, screen_width, screen_height, screen):
         super().__init__()
 
-        # Mendapatkan path file gambar dengan modul os
-                # Dapatkan direktori script saat ini
+        # Dapatkan direktori script saat ini
         current_directory = os.path.dirname(os.path.abspath(__file__))
 
         # Buat jalur file untuk gambar
-        image_path = os.path.join(current_directory,"Gartin.gif")
+        image_path = os.path.join(current_directory,"../resources/assets/Gartin.gif")
 
         # Buat jalur file untuk basic attack
-        self.basic_attack_path = os.path.join(current_directory,"bullet.png")
+        self.basic_attack_path = os.path.join(current_directory,"../resources/assets/bullet.png")
 
         # Load player image and get its rect
         image = pygame.image.load(image_path).convert_alpha()

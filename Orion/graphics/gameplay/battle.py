@@ -1,6 +1,7 @@
 import pygame
 from .player import Player
 from icecream import ic
+import os
 
 class Target:
     def __init__(self, x, y, image, screen):
@@ -48,7 +49,8 @@ class Battle:
         self.screen_height = screen_height
         self.screen_width = screen_width
         self.last_attack_time = 0
-        self.target_image = pygame.transform.scale(pygame.image.load("D:\\2023\\Semester 3\\Grafika Komputer\\Orion\\graphics\\gameplay\\target.png").convert_alpha(), (50, 50))
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        self.target_image = pygame.transform.scale(pygame.image.load(os.path.join(current_directory,"../resources/assets/target.png")).convert_alpha(), (50, 50))
 
         # Membuat objek Player
         self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
@@ -59,7 +61,7 @@ class Battle:
 
         # Inisialisasi 3 target dengan gambar yang telah Anda sediakan
         self.targets = []
-        target_x_positions = [400, 500, 600]  # Atur posisi target sesuai kebutuhan
+        target_x_positions = [400, 700, 1100]  # Atur posisi target sesuai kebutuhan
         for x in target_x_positions:
             target = Target(x, 50, self.target_image, screen=self.screen)
             self.targets.append(target)
@@ -87,6 +89,7 @@ class Battle:
                 for target in self.targets:
                     if target.health <= 0:
                         self.targets.remove(target)
+                        self.player.score+=1
                     if attack.rect.colliderect(target.rect):
                         ic(attack.rect.colliderect(target.rect))
                         ic(target.health)
