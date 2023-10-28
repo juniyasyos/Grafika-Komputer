@@ -3,6 +3,17 @@ from .player import Player
 from icecream import ic
 import os
 
+def load_image(image_filename):
+    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
+    image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
+
+    try:
+        image = pygame.image.load(image_path).convert_alpha()
+        return image
+    except pygame.error as e:
+        print(f"Failed to load image: {image_filename}")
+        raise e
+
 class Target:
     def __init__(self, x, y, image, screen):
         self.x = x
@@ -43,19 +54,29 @@ class BasicAttack:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+
+class skill:
+    def __init__(self, actor, damage, speed, image) -> None:
+        self.actor = actor
+        self.damage = damage
+        self.speed = speed
+        self.image = image
+
+    # def update(self):
+    #     self.actor.s
+
+
 class Battle:
     def __init__(self, screen, screen_width, screen_height):
         self.screen = screen
         self.screen_height = screen_height
         self.screen_width = screen_width
         self.last_attack_time = 0
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.target_image = pygame.transform.scale(pygame.image.load(os.path.join(current_directory,"../resources/assets/target.png")).convert_alpha(), (50, 50))
+        self.target_image = pygame.transform.scale(load_image("../resources/assets/Battle/target.png"),(50,50))
 
         # Membuat objek Player
         self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
-        self.asset_basicAttack_Player = self.player.basic_attack_path
-
+        
         # Inisialisasi list untuk menyimpan serangan dasar
         self.basic_attacks = []
 
@@ -71,7 +92,7 @@ class Battle:
 
         # Cek apakah sudah waktunya untuk serangan dasar baru
         if current_time - self.last_attack_time >= 500:
-            self.create_basic_attack_player()  # Membuat serangan dasar baru
+            self.basic_attacks.append(self.player.create_basic_attack_player(BasicAttack=BasicAttack, player=self.player))  # Membuat serangan dasar baru
             self.last_attack_time = current_time  # Perbarui waktu serangan terakhir
 
         self.player.update(self.screen_width, self.screen_height, self.player.speed)
@@ -91,8 +112,8 @@ class Battle:
                         self.targets.remove(target)
                         self.player.score+=1
                     if attack.rect.colliderect(target.rect):
-                        ic(attack.rect.colliderect(target.rect))
-                        ic(target.health)
+                        # ic(attack.rect.colliderect(target.rect))
+                        # ic(target.health)
                         target.health-=self.player.get_damage()
                         self.basic_attacks.remove(attack)
 
@@ -108,8 +129,3 @@ class Battle:
         # Draw countdown cooldown text
         cooldown_text = self.player.font.render(self.player.skill_cooldown_text, True, (255, 255, 255))
         self.screen.blit(cooldown_text, (10, 10))
-
-    def create_basic_attack_player(self):
-        # Membuat serangan dasar baru dan menambahkannya ke daftar serangan dasar
-        basic_attack = BasicAttack(self.player, damage=10, speed=20, image=pygame.transform.scale((pygame.image.load(self.asset_basicAttack_Player)),(50,50)), direction="up")
-        self.basic_attacks.append(basic_attack)
