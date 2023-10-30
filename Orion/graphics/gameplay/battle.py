@@ -71,14 +71,13 @@ class Battle:
         self.screen = screen
         self.screen_height = screen_height
         self.screen_width = screen_width
-        self.last_attack_time = 0
         self.target_image = pygame.transform.scale(load_image("../resources/assets/Battle/target.png"),(50,50))
 
         # Membuat objek Player
         self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
         
-        # Inisialisasi list untuk menyimpan serangan dasar
-        self.basic_attacks = []
+        # Inisialisasi list untuk menyimpan basic attack
+        self.player_basic_attacks = []
 
         # Inisialisasi 3 target dengan gambar yang telah Anda sediakan
         self.targets = []
@@ -89,20 +88,19 @@ class Battle:
 
     def run(self):
         current_time = pygame.time.get_ticks()
-
-        # Cek apakah sudah waktunya untuk serangan dasar baru
-        if current_time - self.last_attack_time >= 500:
-            self.basic_attacks.append(self.player.create_basic_attack_player(BasicAttack=BasicAttack, player=self.player))  # Membuat serangan dasar baru
-            self.last_attack_time = current_time  # Perbarui waktu serangan terakhir
-
-        self.player.update(self.screen_width, self.screen_height, self.player.speed)
-
+        
         # Gambar kembali objek pemain
         self.player.update(self.screen_width, self.screen_height, self.player.speed)
 
         # Menggambar dan mengupdate serangan dasar
         if self.targets != []:
-            for attack in self.basic_attacks:
+            # Basic attack Player
+            player_basicAttack = self.player.create_basic_attack_player(BasicAttack=BasicAttack, player=self.player, current_time=current_time, last_time=self.player.last_BasicAttack_time, amount_BasicAttack=len(self.player_basic_attacks))
+            if player_basicAttack is not None:
+                self.player_basic_attacks.append(player_basicAttack)
+                self.player.last_BasicAttack_time = current_time
+
+            for attack in self.player_basic_attacks:
                 attack.update()
                 attack.draw(self.screen)
 
@@ -111,11 +109,25 @@ class Battle:
                     if target.health <= 0:
                         self.targets.remove(target)
                         self.player.score+=1
+
                     if attack.rect.colliderect(target.rect):
                         # ic(attack.rect.colliderect(target.rect))
                         # ic(target.health)
                         target.health-=self.player.get_damage()
-                        self.basic_attacks.remove(attack)
+                        self.player_basic_attacks.remove(attack)
+        
+        else:
+            for attack in self.player_basic_attacks:
+                attack.update()
+                attack.draw(self.screen)
+                
+                if attack.rect.y <= 0:
+                    self.player_basic_attacks.remove(attack)
+        
+        # hapus basic attack jika melampui batas
+        for attack in self.player_basic_attacks:                
+            if attack.rect.y <= 0:
+                self.player_basic_attacks.remove(attack)
 
         # Menggambar target
         for target in self.targets:
@@ -125,7 +137,3 @@ class Battle:
         # Draw player health bar and score
         self.player.draw_health_bar(self.screen)
         self.player.draw_score(self.screen)
-
-        # Draw countdown cooldown text
-        cooldown_text = self.player.font.render(self.player.skill_cooldown_text, True, (255, 255, 255))
-        self.screen.blit(cooldown_text, (10, 10))

@@ -15,7 +15,6 @@ class Game:
         self.HEIGHT = WINDOW_INFO_SIZE.current_h - 60
         self.WINDOW_SIZE = (self.WIDTH,self.HEIGHT)
         self.set_background = self.load_image("\\graphics\\resources\\assets\\Menu\\home.png")
-        self.functions = []
 
         # navigasi keyboard jendela
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE,pygame.RESIZABLE)
@@ -29,14 +28,8 @@ class Game:
         while running:
             self.screen.blit(self.set_background, (0, 0))
             running = self.mainMenu.rendering(color='silver', height=self.HEIGHT, width=self.WIDTH)
-
-            clock.tick(70)
+            clock.tick(60)
             pygame.display.update()
-
-    def elemenGame(self):
-        for func in self.functions:
-            func()
-
 
     def load_image(self, image_filename):
         current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -48,9 +41,6 @@ class Game:
         except pygame.error as e:
             print(f"Failed to load image: {image_filename}")
             raise e
-
-    set_function = lambda self,func :self.functions.append(func)
-
 
 game = Game()
 game.rendering()

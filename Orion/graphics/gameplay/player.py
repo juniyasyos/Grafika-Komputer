@@ -2,13 +2,10 @@ import pygame
 import os
 from icecream import ic
 
-def load_image(image_filename, path=False):
+def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
     image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
     
-    if path:
-        return image_path
-
     try:
         image = pygame.image.load(image_path).convert_alpha()
         return image
@@ -22,7 +19,7 @@ class Player(pygame.sprite.Sprite):
 
         # Load player image and get its rect
         image = load_image("../resources/assets/Battle/PLAYER.png")
-        self.basic_attack = load_image("../resources/assets/Battle/bullet.png")
+        self.basic_attack_path = load_image("../resources/assets/Battle/bullet.png")
         self.image = pygame.transform.scale(image, (70, 70))
         self.rect = self.image.get_rect()
         self.screen = screen
@@ -34,15 +31,12 @@ class Player(pygame.sprite.Sprite):
         self.current_time = 0
 
         # Set player attributes
-        self.speed = 5
+        self.speed = 8
         self.health = 100
         self.max_health = 100
         self.score = 0
         self.damage = 0
-
-        self.skill_cooldown_timer = 0  # Waktu countdown cooldown skill
-        self.skill_cooldown_text = ""  # Teks countdown
-        self.font = pygame.font.Font(None, 36)  # Font untuk teks countdown
+        self.last_BasicAttack_time = 0
 
         # Player abilities/skills
         self.skills = {
@@ -77,23 +71,16 @@ class Player(pygame.sprite.Sprite):
         self.draw_health_bar(self.screen)
         self.draw_score(self.screen)
 
-        # Draw countdown cooldown text
-        cooldown_text = self.font.render(self.skill_cooldown_text, True, (0, 0, 0))
-        self.screen.blit(cooldown_text, (100, 100))  # Ganti posisi sesuai kebutuhan
-
-        if self.skill_cooldown_timer > 0:
-            self.skill_cooldown_timer -= 1
-            self.skill_cooldown_text = str(self.skill_cooldown_timer // 60 + 1)  # Hitung detik tersisa
-        else:
-            self.skill_cooldown_text = ""  # Cooldown telah selesai
-        # ic(self.skill_cooldown_text)
-
         # Keep player within the screen boundaries
         self.rect.x = max(0, min(self.rect.x, screen_width - self.rect.width))
         self.rect.y = max(0, min(self.rect.y, screen_height - self.rect.height))
 
         # Draw player
         self.screen.blit(self.image, self.rect)
+
+        # Skills
+        if self.skills["speed_boost"]["active"] is True:
+            pass
 
     def take_damage(self, damage):
         self.health -= damage
@@ -118,7 +105,10 @@ class Player(pygame.sprite.Sprite):
         text = font.render(f"Score: {self.score}", True, (255, 255, 255))
         screen.blit(text, (10, 10))
 
-    def create_basic_attack_player(self, BasicAttack, player):
-        # Membuat serangan dasar baru dan menambahkannya ke daftar serangan dasar
-        basic_attack = BasicAttack(player, damage=10, speed=20, image=pygame.transform.scale((self.basic_attack),(30,30)), direction="up")
-        return basic_attack
+    def create_basic_attack_player(self, BasicAttack, player, current_time=0, last_time=0, amount_BasicAttack=0):
+        if amount_BasicAttack <= 4:
+            if current_time - last_time >= 30:        
+                return BasicAttack(player, damage=10, speed=20, image=pygame.transform.scale((self.basic_attack_path),(30,30)), direction="up")
+        return None
+    
+    
