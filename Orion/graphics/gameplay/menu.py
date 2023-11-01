@@ -3,8 +3,6 @@ import sys
 from .battle import Battle
 import os
 
-
-
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
     image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
@@ -125,9 +123,6 @@ class Beranda:
         else:
             self.views_Beranda(width=width, height=height)
         
-        for button in self.buttons:
-            self.draw_button(button)
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -137,7 +132,10 @@ class Beranda:
                 self.HEIGHT = event.h  # Perbarui tinggi layar
                 self.WINDOW_SIZE = (self.WIDTH, self.HEIGHT)
                 self.set_background = load_image("../resources/assets/Menu/home.png")
-        return True
 
+        for button in self.buttons:
+            self.draw_button(button)
+        return True
+        
     def set_path(self, path):
         self.path = path

@@ -1,6 +1,7 @@
 import pygame
 import os
 from icecream import ic
+import threading
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -67,15 +68,27 @@ class Player(pygame.sprite.Sprite):
                             skill_data["last_used"] = current_time
                             skill_data["active"] = True
                             skill_data["used"] += 1
+                            
 
     def update(self):
         current_time = pygame.time.get_ticks()
-        self.handle_events(current_time)
+        event = lambda: self.handle_events(current_time)
 
         # Gambar batang kesehatan dan skor pemain
-        self.draw_health_bar()
-        self.draw_score()
-        self.draw_icon_skill(current_time=current_time)
+        health_bar = lambda: self.draw_health_bar()
+        score = lambda: self.draw_score()
+        icon_skill = lambda: self.draw_icon_skill(current_time=current_time)
+
+
+        def skill_use():
+            # Loop untuk memproses skills
+            for skill_key, skill_data in self.skills.items():
+                for skill_name, skill_data in skill_data.items():
+                    # Logic Skill
+                    if skill_name == "speed":
+                        self.speed = 20 if skill_data["active"] else 8
+                        if current_time - skill_data["last_used"] >= skill_data["duration"]:
+                            skill_data["active"] = False
 
         # Pastikan pemain tetap dalam batasan layar
         self.rect.x = max(0, min(self.rect.x, self.screen.get_width() - self.rect.width))
@@ -84,14 +97,17 @@ class Player(pygame.sprite.Sprite):
         # Gambar pemain
         self.screen.blit(self.image, self.rect)
 
-        # Loop untuk memproses skills
-        for skill_key, skill_data in self.skills.items():
-            for skill_name, skill_data in skill_data.items():
-                # Logic Skill
-                if skill_name == "speed":
-                    self.speed = 20 if skill_data["active"] else 8
-                    if current_time - skill_data["last_used"] >= skill_data["duration"]:
-                        skill_data["active"] = False
+        # Pemanfaatan threading         
+        threads = []
+        for operation in [event, health_bar, score, icon_skill, skill_use]:
+            thread = threading.Thread(target=operation)
+            threads.append(thread)
+            thread.start()
+        
+        for thread in threads:
+            thread.join()
+            
+
     
     def take_damage(self, damage):
         self.health -= damage

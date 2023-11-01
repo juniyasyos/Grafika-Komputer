@@ -4,6 +4,7 @@ from .enemy import obj_Enemy
 from icecream import ic
 import os
 import random
+import threading
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -63,7 +64,7 @@ class Battle:
         current_time = pygame.time.get_ticks()
         
         # Gambar kembali objek pemain
-        self.player.update()
+        update_player = lambda: self.player.update()
         
         # Membuat dan mengupdate serangan dasar pemain
         for attack in self.player_basic_attacks:
@@ -78,49 +79,61 @@ class Battle:
         self.player_basic_attacks = list(filter(lambda attack: attack.rect.y > 0, self.player_basic_attacks))
         self.enemy_basic_attacks = list(filter(lambda attack: attack.rect.y > 0, self.enemy_basic_attacks))
         
-        # Membuat serangan dasar baru jika pemain menembak
-        if len(self.Enemys) != 0:
-            player_basic_attack = self.player.create_basic_attack_player(BasicAttack, self.player, len(self.player_basic_attacks), current_time, self.player.last_BasicAttack_time)
-            if player_basic_attack is not None:
-                self.player_basic_attacks.append(player_basic_attack)
-                self.player.last_BasicAttack_time = current_time
+        def cek_basic_attack():
+            # Membuat serangan dasar baru jika pemain menembak
+            if len(self.Enemys) != 0:
+                player_basic_attack = self.player.create_basic_attack_player(BasicAttack, self.player, len(self.player_basic_attacks), current_time, self.player.last_BasicAttack_time)
+                if player_basic_attack is not None:
+                    self.player_basic_attacks.append(player_basic_attack)
+                    self.player.last_BasicAttack_time = current_time
 
-            for enemy in self.Enemys:
-                enemy_basic_attack = enemy.create_basic_attack_enemy(BasicAttack, enemy, len(self.enemy_basic_attacks), current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=random.randint(2000,5000))
-                if enemy_basic_attack is not None:
-                    self.enemy_basic_attacks.append(enemy_basic_attack)
-                    enemy.last_BasicAttack_time = current_time
+                for enemy in self.Enemys:
+                    enemy_basic_attack = enemy.create_basic_attack_enemy(BasicAttack, enemy, len(self.enemy_basic_attacks), current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=random.randint(2000,5000))
+                    if enemy_basic_attack is not None:
+                        self.enemy_basic_attacks.append(enemy_basic_attack)
+                        enemy.last_BasicAttack_time = current_time
 
-        else:
-            for attack in self.player_basic_attacks:
-                if attack.rect.y <= 0:
-                    self.player_basic_attacks.remove(attack)
+            else:
+                for attack in self.player_basic_attacks:
+                    if attack.rect.y <= 0:
+                        self.player_basic_attacks.remove(attack)
 
-            for attack in self.enemy_basic_attacks:
-                if attack.rect.y >= self.screen_height:
-                    self.enemy_basic_attacks.remove(attack)
-        
-        # Menggambar enemy
-        for enemy in self.Enemys:
-            enemy.draw(self.screen)
-            enemy.draw_health()
-            
-            # Periksa tabrakan dengan serangan dasar
-            for attack in self.player_basic_attacks:
-                if enemy.health <= 0:
-                    if enemy in self.Enemys : 
-                        self.Enemys.remove(enemy)
-                        self.player.score += 1
-                if attack.rect.colliderect(enemy.rect):
-                    enemy.health -= self.player.damage
-                    self.player_basic_attacks.remove(attack)
-
-            for enemy in self.Enemys:
                 for attack in self.enemy_basic_attacks:
-                    # Logika player kalah
-
-                    # if self.player.health <= 0:
-                    #     ic("player kalah")
-                    if attack.rect.colliderect(self.player.rect):
-                        self.player.health -= enemy.damage
+                    if attack.rect.y >= self.screen_height:
                         self.enemy_basic_attacks.remove(attack)
+        
+        def create_enemy():
+            # Menggambar enemy
+            for enemy in self.Enemys:
+                enemy.draw(self.screen)
+                enemy.draw_health()
+                
+                # Periksa tabrakan dengan serangan dasar
+                for attack in self.player_basic_attacks:
+                    if enemy.health <= 0:
+                        if enemy in self.Enemys : 
+                            self.Enemys.remove(enemy)
+                            self.player.score += 1
+                    if attack.rect.colliderect(enemy.rect):
+                        enemy.health -= self.player.damage
+                        self.player_basic_attacks.remove(attack)
+
+                for enemy in self.Enemys:
+                    for attack in self.enemy_basic_attacks:
+                        # Logika player kalah
+
+                        # if self.player.health <= 0:
+                        #     ic("player kalah")
+                        if attack.rect.colliderect(self.player.rect):
+                            self.player.health -= enemy.damage
+                            self.enemy_basic_attacks.remove(attack)
+
+        
+        threads = []
+        for operation in [update_player, cek_basic_attack, create_enemy]:
+            thread = threading.Thread(target=operation)
+            thread.start()
+            threads.append(thread)
+        
+        for thread in threads:
+            thread.join()
