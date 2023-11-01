@@ -18,97 +18,108 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # Load player image and get its rect
-        image = load_image("../resources/assets/Battle/PLAYER.png")
-        self.basic_attack_path = load_image("../resources/assets/Battle/bullet.png")
-        self.image = pygame.transform.scale(image, (70, 70))
+        self.image = pygame.transform.scale(load_image("../resources/assets/Battle/PLAYER.png"), (70, 70))
         self.rect = self.image.get_rect()
         self.screen = screen
+        self.font = pygame.font.Font(None, 36)
 
         # Set initial position
         self.rect.centerx = screen_width // 2
         self.rect.bottom = screen_height - 10
 
-        self.current_time = 0
-
-        # Set player attributes
+        # Player attributes
         self.speed = 8
-        self.health = 100
-        self.max_health = 100
+        self.health = self.max_health = 100
         self.score = 0
-        self.damage = 0
+        self.damage = 10
         self.last_BasicAttack_time = 0
+        self.shield = 50
+        self.regen_hp = 0.5
+        self.basic_attack_path = load_image("../resources/assets/Battle/bullet.png")
 
-        # Player abilities/skills
+        # Player skills
         self.skills = {
-            "speed_boost": {"active": False, "cooldown": 0, "duration": 5, "last_used": 0},
-            "shield": {"active": False, "cooldown": 0, "duration": 10, "last_used": 0},
+            "1": {"speed": {"active": False, "cooldown": 9000, "duration": 5000, "last_used": 0, "used": 0}},
+            "4": {"shield": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
+            "3": {"rocket": {"active": False, "cooldown": 30000, "duration": 5000, "last_used": 0, "used": 0}},
+            "SPACE": {"regen": {"active": False, "cooldown": 50000, "duration": 10000, "last_used": 0, "used": 0}},
+            "2": {"masif_basic_attack": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}}
         }
 
-    def get_damage(self, damage=10):
-        return self.damage + damage
-
-    def handle_events(self, speed):
+    def handle_events(self, current_time):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            self.use_skill("speed_boost")
-        if keys[pygame.K_LSHIFT]:
-            self.use_skill("shield")
         if keys[pygame.K_LEFT]:
-            self.rect.x -= speed
+            self.rect.x -= self.speed
         if keys[pygame.K_RIGHT]:
-            self.rect.x += speed
+            self.rect.x += self.speed
         if keys[pygame.K_UP]:
-            self.rect.y -= speed
+            self.rect.y -= self.speed
         if keys[pygame.K_DOWN]:
-            self.rect.y += speed
-        # ic(self.rect)
-        
+            self.rect.y += self.speed
 
-    def update(self, screen_width, screen_height, speed):
-        self.handle_events(speed=speed)
+        # Kontrol keterampilan
+        for skill_key, skill_data in self.skills.items():
+            # ic(keys[pygame.key.key_code(skill_key)])
+            if keys[pygame.key.key_code(skill_key)]:
+                for skill_name, skill_data in skill_data.items():
+                    if current_time - skill_data["last_used"] >= skill_data["cooldown"] or skill_data["last_used"] == 0:
+                        if not skill_data["active"]:
+                            skill_data["last_used"] = current_time
+                            skill_data["active"] = True
+                            skill_data["used"] += 1
 
-        # Draw player health bar and score
-        self.draw_health_bar(self.screen)
-        self.draw_score(self.screen)
+    def update(self):
+        current_time = pygame.time.get_ticks()
+        self.handle_events(current_time)
 
-        # Keep player within the screen boundaries
-        self.rect.x = max(0, min(self.rect.x, screen_width - self.rect.width))
-        self.rect.y = max(0, min(self.rect.y, screen_height - self.rect.height))
+        # Gambar batang kesehatan dan skor pemain
+        self.draw_health_bar()
+        self.draw_score()
+        self.draw_icon_skill(current_time=current_time)
 
-        # Draw player
+        # Pastikan pemain tetap dalam batasan layar
+        self.rect.x = max(0, min(self.rect.x, self.screen.get_width() - self.rect.width))
+        self.rect.y = max(0, min(self.rect.y, self.screen.get_height() - self.rect.height))
+
+        # Gambar pemain
         self.screen.blit(self.image, self.rect)
 
-        # Skills
-        if self.skills["speed_boost"]["active"] is True:
-            pass
-
+        # Loop untuk memproses skills
+        for skill_key, skill_data in self.skills.items():
+            for skill_name, skill_data in skill_data.items():
+                # Logic Skill
+                if skill_name == "speed":
+                    self.speed = 20 if skill_data["active"] else 8
+                    if current_time - skill_data["last_used"] >= skill_data["duration"]:
+                        skill_data["active"] = False
+    
     def take_damage(self, damage):
         self.health -= damage
-        if self.health <= 0:
-            self.health = 0
-            # Player is defeated, handle game over logic here
+        self.health = max(self.health, 0)
 
-    def use_skill(self, skill_name):
-        if self.skills[skill_name]["cooldown"] == 0 and not self.skills[skill_name]["active"]:
-            # Activate the skill and set cooldown
-            self.skills[skill_name]["active"] = True
-            self.skills[skill_name]["cooldown"] = self.skills[skill_name]["duration"]
-            # ic(self.skills)
-
-    def draw_health_bar(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.rect.x, self.rect.y - 10, self.rect.width, 5))
+    def draw_health_bar(self):
+        pygame.draw.rect(self.screen, (255, 0, 0), (self.rect.x, self.rect.y - 10, self.rect.width, 5))
         current_health_width = (self.health / self.max_health) * self.rect.width
-        pygame.draw.rect(screen, (0, 255, 0), (self.rect.x, self.rect.y - 10, current_health_width, 5))
+        pygame.draw.rect(self.screen, (0, 255, 0), (self.rect.x, self.rect.y - 10, current_health_width, 5))
 
-    def draw_score(self, screen):
-        font = pygame.font.Font(None, 36)
-        text = font.render(f"Score: {self.score}", True, (255, 255, 255))
-        screen.blit(text, (10, 10))
+    def draw_score(self):
+        text = self.font.render(f"Skor: {self.score}", True, (255, 255, 255))
+        self.screen.blit(text, (10, 10))
 
-    def create_basic_attack_player(self, BasicAttack, player, current_time=0, last_time=0, amount_BasicAttack=0):
-        if amount_BasicAttack <= 4:
-            if current_time - last_time >= 30:        
-                return BasicAttack(player, damage=10, speed=20, image=pygame.transform.scale((self.basic_attack_path),(30,30)), direction="up")
+    def create_basic_attack_player(self, BasicAttack, player, amount_BasicAttack, current_time, last_time):
+        last_time = 0  # Atur nilai awal yang sesuai untuk last_time
+        if amount_BasicAttack <= 4 and current_time - last_time >= 30:
+            return BasicAttack(player, damage=10, speed=20, image=pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="up")
         return None
-    
-    
+
+    def draw_icon_skill(self, current_time):
+        for i, (skill_key, skill_data) in enumerate(self.skills.items(), start=1):
+            for skill_name, skill_data in skill_data.items():
+                # Set Cooldown skill
+                calculate_cooldown = lambda skill_data, current_time: max(0, ((skill_data["last_used"] - current_time) + skill_data["cooldown"]) // 1000) if skill_data["used"] != 0 else 0
+                cooldown = calculate_cooldown(skill_data, current_time)
+                
+                # Show cooldown skill
+                pygame.draw.rect(self.screen, "white", [10, 70 + i * 60, 150, 50])
+                text = self.font.render(f"{skill_name}: {cooldown}", True, "black")
+                self.screen.blit(text, (10, 80 + i * 60))
