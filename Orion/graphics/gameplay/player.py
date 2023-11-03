@@ -23,7 +23,7 @@ class Player():
         self.image = pygame.transform.scale(load_image("../resources/assets/Battle/PLAYER.png"), (70, 70))
         self.rect = self.image.get_rect()
         self.screen = screen
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 24)
 
         # Set initial position
         self.rect.centerx = screen_width // 2
@@ -79,7 +79,6 @@ class Player():
         health_bar = lambda: self.draw_health_bar()
         score = lambda: self.draw_score()
         icon_skill = lambda: self.draw_icon_skill(current_time=current_time)
-
 
         def skill_use():
             # Loop untuk memproses skills

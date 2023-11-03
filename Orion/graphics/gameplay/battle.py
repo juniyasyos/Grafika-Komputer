@@ -118,7 +118,7 @@ class Battle:
 
         
         threads = []
-        for operation in [thread_attack_player, thread_attack_player, remove_elemen_obj, update_player, cek_basic_attack, create_enemy]:
+        for operation in [thread_attack_player, thread_attack_player, thread_attack_enemy, remove_elemen_obj, update_player, cek_basic_attack, create_enemy]:
             thread = threading.Thread(target=operation)
             thread.start()
             threads.append(thread)
