@@ -9,12 +9,13 @@ def load_image(image_filename):
     
     try:
         image = pygame.image.load(image_path).convert_alpha()
+        image = image.convert()
         return image
     except pygame.error as e:
         print(f"Failed to load image: {image_filename}")
         raise e
 
-class Player(pygame.sprite.Sprite):
+class Player():
     def __init__(self, screen_width, screen_height, screen):
         super().__init__()
 
@@ -86,7 +87,7 @@ class Player(pygame.sprite.Sprite):
                 for skill_name, skill_data in skill_data.items():
                     # Logic Skill
                     if skill_name == "speed":
-                        self.speed = 20 if skill_data["active"] else 8
+                        self.speed = 20 if skill_data["active"] else 10
                         if current_time - skill_data["last_used"] >= skill_data["duration"]:
                             skill_data["active"] = False
 
@@ -106,9 +107,7 @@ class Player(pygame.sprite.Sprite):
         
         for thread in threads:
             thread.join()
-            
-
-    
+                
     def take_damage(self, damage):
         self.health -= damage
         self.health = max(self.health, 0)
@@ -123,8 +122,7 @@ class Player(pygame.sprite.Sprite):
         self.screen.blit(text, (10, 10))
 
     def create_basic_attack_player(self, BasicAttack, player, amount_BasicAttack, current_time, last_time):
-        last_time = 0  # Atur nilai awal yang sesuai untuk last_time
-        if amount_BasicAttack <= 4 and current_time - last_time >= 30:
+        if  current_time - last_time >= 500:
             return BasicAttack(player, damage=10, speed=20, image=pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="up")
         return None
 

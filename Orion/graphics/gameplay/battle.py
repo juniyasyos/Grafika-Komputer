@@ -17,7 +17,7 @@ def load_image(image_filename):
         print(f"Failed to load image: {image_filename}")
         raise e
 
-class BasicAttack:
+class BasicAttack(pygame.sprite.Sprite):
     def __init__(self, actor, damage, speed, image, direction):
         self.actor = actor
         self.damage = damage
@@ -46,19 +46,13 @@ class Battle:
         self.screen_width = screen_width
         self.Enemy_image = pygame.transform.rotate(pygame.transform.scale(load_image("../resources/assets/Battle/NPC.png"), (50, 50)),180)
 
-        # Membuat objek Player
+        # Membuat objek Player dan elemennya
         self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
+        self.player_basic_attacks = pygame.sprite.Group()
 
-        # Inisialisasi list untuk menyimpan basic attack karakter
-        self.player_basic_attacks = []
-        self.enemy_basic_attacks = []
-
-        # Inisialisasi 3 Enemy dengan gambar yang telah Anda sediakan
-        self.Enemys = []
-        Enemy_x_positions = [400, 700, 1100]  # Atur posisi Enemy sesuai kebutuhan
-        for x in Enemy_x_positions:
-            Enemy = obj_Enemy(x, 50, self.Enemy_image, screen=self.screen)
-            self.Enemys.append(Enemy)
+        # Membuat objek Enemy dan elemennya
+        self.Enemys = [obj_Enemy(random.randint(100,800), 50, self.Enemy_image, screen=self.screen)]
+        self.enemy_basic_attacks = pygame.sprite.Group()
 
     def run(self):
         current_time = pygame.time.get_ticks()
@@ -66,41 +60,35 @@ class Battle:
         # Gambar kembali objek pemain
         update_player = lambda: self.player.update()
         
-        # Membuat dan mengupdate serangan dasar pemain
-        for attack in self.player_basic_attacks:
-            attack.update()
-            attack.draw(self.screen)
+        def thread_attack_player():
+            # Membuat dan mengupdate serangan dasar pemain
+            for attack in self.player_basic_attacks:
+                attack.update()
+                attack.draw(self.screen)
         
-        for attack in self.enemy_basic_attacks:
-            attack.update()
-            attack.draw(self.screen)
+        def thread_attack_enemy():
+            for attack in self.enemy_basic_attacks:
+                attack.update()
+                attack.draw(self.screen)
             
-        # Menghapus serangan dasar yang melampaui batas
-        self.player_basic_attacks = list(filter(lambda attack: attack.rect.y > 0, self.player_basic_attacks))
-        self.enemy_basic_attacks = list(filter(lambda attack: attack.rect.y > 0, self.enemy_basic_attacks))
+        def remove_elemen_obj():
+            # Menghapus serangan dasar yang melampaui batas
+            self.player_basic_attacks = list(filter(lambda attack: attack.rect.y > 0, self.player_basic_attacks))
+            self.enemy_basic_attacks = list(filter(lambda attack: attack.rect.y < self.screen_height, self.enemy_basic_attacks))
         
         def cek_basic_attack():
             # Membuat serangan dasar baru jika pemain menembak
-            if len(self.Enemys) != 0:
+            for enemy in self.Enemys:
+                enemy_basic_attack = enemy.create_basic_attack_enemy(BasicAttack, enemy, len(self.enemy_basic_attacks), current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=random.randint(2000,5000))
+                if enemy_basic_attack is not None:
+                    self.enemy_basic_attacks.append(enemy_basic_attack)
+                    enemy.last_BasicAttack_time = current_time
+
+            if self.Enemys:
                 player_basic_attack = self.player.create_basic_attack_player(BasicAttack, self.player, len(self.player_basic_attacks), current_time, self.player.last_BasicAttack_time)
                 if player_basic_attack is not None:
                     self.player_basic_attacks.append(player_basic_attack)
                     self.player.last_BasicAttack_time = current_time
-
-                for enemy in self.Enemys:
-                    enemy_basic_attack = enemy.create_basic_attack_enemy(BasicAttack, enemy, len(self.enemy_basic_attacks), current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=random.randint(2000,5000))
-                    if enemy_basic_attack is not None:
-                        self.enemy_basic_attacks.append(enemy_basic_attack)
-                        enemy.last_BasicAttack_time = current_time
-
-            else:
-                for attack in self.player_basic_attacks:
-                    if attack.rect.y <= 0:
-                        self.player_basic_attacks.remove(attack)
-
-                for attack in self.enemy_basic_attacks:
-                    if attack.rect.y >= self.screen_height:
-                        self.enemy_basic_attacks.remove(attack)
         
         def create_enemy():
             # Menggambar enemy
@@ -130,7 +118,7 @@ class Battle:
 
         
         threads = []
-        for operation in [update_player, cek_basic_attack, create_enemy]:
+        for operation in [thread_attack_player, thread_attack_player, remove_elemen_obj, update_player, cek_basic_attack, create_enemy]:
             thread = threading.Thread(target=operation)
             thread.start()
             threads.append(thread)

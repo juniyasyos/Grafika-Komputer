@@ -14,7 +14,7 @@ def load_image(image_filename):
         print(f"Failed to load image: {image_filename}")
         raise e
         
-class obj_Enemy:
+class obj_Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, image, screen):
         self.x = x
         self.y = y
