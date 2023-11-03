@@ -48,4 +48,6 @@ Kami sangat menyambut kontribusi dari komunitas! Jika Anda tertarik untuk berkon
 
 3. **Buat Pull Request**: Setelah Anda selesai melakukan perubahan, buat _pull request_ untuk menggabungkan perubahan Anda kembali ke repositori utama.
 
+by Kelompok B
+
 Terima kasih!
