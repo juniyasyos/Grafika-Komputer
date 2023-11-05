@@ -16,7 +16,7 @@ def load_image(image_filename):
         raise e
         
 class obj_Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, image, screen):
+    def __init__(self, x, y, image, screen, path, delay):
         super().__init__()
         self.x = 0
         self.y = 0
@@ -30,10 +30,36 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.damage = 50
         self.start_time = 0
         self.last_time = pygame.time.get_ticks()
+        self.path = path
+        self.delay_to_next_path = delay
+        self.path_index = 0
+        self.delay_start_time = 0
+        self.speed = 5
         self.basic_attack_path = pygame.transform.rotate(load_image("../resources/assets/Battle/bullet.png"), 180)
+        self.set_update_enemy = []
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+    
+    def update(self):
+        for func_update_enemy in self.set_update_enemy: func_update_enemy()
+
+        if self.path_index < len(self.path):
+            target_x, target_y = self.path[self.path_index]
+            dx = target_x - self.x
+            dy = target_y - self.y
+
+            distance = dx * dx + dy * dy
+
+            tolerance_squared = 10
+            if distance < tolerance_squared:
+                if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
+                    self.path_index += 1
+                    self.delay_start_time = pygame.time.get_ticks()
+            else:
+                self.move_towards(target_x, target_y, self.speed)
+            return True
+        return False
 
     def move_towards(self, target_x, target_y, speed):
         delta_x = target_x - self.x
@@ -64,27 +90,4 @@ class obj_Enemy(pygame.sprite.Sprite):
 class EnemyType1(obj_Enemy):
     def __init__(self, screen, path, delay, x=0, y=0):
         image = pygame.transform.rotate(pygame.transform.scale(load_image("../resources/assets/Battle/NPC.png"), (70, 70)), 180)
-        super().__init__(x, y, image, screen)
-        self.path = path
-        self.delay_to_next_path = delay
-        self.path_index = 0
-        self.delay_start_time = 0
-        self.speed = 5
-    
-    def update(self):
-        if self.path_index < len(self.path):
-            target_x, target_y = self.path[self.path_index]
-            dx = target_x - self.x
-            dy = target_y - self.y
-
-            distance = dx * dx + dy * dy
-
-            tolerance_squared = 10
-            if distance < tolerance_squared:
-                if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
-                    self.path_index += 1
-                    self.delay_start_time = pygame.time.get_ticks()
-            else:
-                self.move_towards(target_x, target_y, self.speed)
-            return True
-        return False
+        super().__init__(x, y, image, screen, path, delay)
