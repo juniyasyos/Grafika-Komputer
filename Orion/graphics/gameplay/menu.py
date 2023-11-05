@@ -1,6 +1,6 @@
 import pygame
 import sys
-from .battle import Battle
+from .battle import level_1
 import os
 
 def load_image(image_filename):
@@ -41,7 +41,7 @@ class Beranda:
         self.screen_height = screen_height
         self.set_background = background
         self.path = "Beranda"
-        self.battle = Battle(self.screen, self.screen_width, self.screen_height)
+        self.battle = None
         self.buttons = pygame.sprite.Group()
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
@@ -56,7 +56,7 @@ class Beranda:
         self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 + 260, action=[self.set_path], parameters=[["Beranda"]])
 
     def views_Beranda(self):
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path], parameters=[["Battle"]])
+        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Battle"],[level_1, [self.screen, self.screen_width, self.screen_height]]])
         self.add_button(load_image("../resources/assets/Menu/inventory_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 20)
         self.add_button(load_image("../resources/assets/Menu/exit_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 200, action=[pygame.quit, sys.exit])
 
@@ -95,3 +95,5 @@ class Beranda:
 
     def set_path(self, path):
         self.path = path
+    def set_Level(self, Level, parameters):
+        self.battle = Level(*parameters)

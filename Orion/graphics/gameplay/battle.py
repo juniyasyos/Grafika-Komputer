@@ -118,4 +118,17 @@ class Battle:
                     if attack.rect.colliderect(self.player.rect):
                         self.player.take_damage(self.player.damage)
                         self.enemy_basic_attacks.remove(attack)
-                enemy.update()
+                
+                remove_enemy = enemy.update()
+                if remove_enemy is False:
+                    self.Enemys.remove(enemy)
+
+
+class level_1(Battle):
+    def __init__(self, screen, screen_height, screen_width):
+        super().__init__(screen, screen_height, screen_width)
+        self.Enemys = [
+            EnemyType1(screen=self.screen,path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[0, 10000, 0]),
+            EnemyType1(screen=self.screen,path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[200, 10000, 0]),
+            EnemyType1(screen=self.screen,path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[200, 10000, 0])
+        ]

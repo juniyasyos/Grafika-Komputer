@@ -86,3 +86,5 @@ class EnemyType1(obj_Enemy):
                     self.delay_start_time = pygame.time.get_ticks()
             else:
                 self.move_towards(target_x, target_y, self.speed)
+            return True
+        return False
