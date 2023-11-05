@@ -30,7 +30,7 @@ class Game:
         while running:
             self.screen.blit(self.set_background, (0, 0))
             running = self.mainMenu.rendering(height=self.HEIGHT, width=self.WIDTH)
-            clock.tick(60)
+            clock.tick(45)
 
             text = self.font.render(f"fps: {int(clock.get_fps())}", True, "white")
             self.screen.blit(text, (20, self.HEIGHT-50))
