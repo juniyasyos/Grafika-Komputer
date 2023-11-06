@@ -42,24 +42,27 @@ class obj_Enemy(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
     
     def update(self):
-        for func_update_enemy in self.set_update_enemy: func_update_enemy()
+        if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
+            for func_update_enemy in self.set_update_enemy: func_update_enemy()
 
-        if self.path_index < len(self.path):
-            target_x, target_y = self.path[self.path_index]
-            dx = target_x - self.x
-            dy = target_y - self.y
+            if self.path_index < len(self.path):
+                target_x, target_y = self.path[self.path_index]
+                dx = target_x - self.x
+                dy = target_y - self.y
 
-            distance = dx * dx + dy * dy
+                distance = dx * dx + dy * dy
 
-            tolerance_squared = 10
-            if distance < tolerance_squared:
-                if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
-                    self.path_index += 1
-                    self.delay_start_time = pygame.time.get_ticks()
-            else:
-                self.move_towards(target_x, target_y, self.speed)
-            return True
-        return False
+                tolerance_squared = 10
+                if distance < tolerance_squared:
+                    if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
+                        self.path_index += 1
+                        self.delay_start_time = pygame.time.get_ticks()
+                else:
+                    self.move_towards(target_x, target_y, self.speed)
+            return False
+        else:
+            return False
+        return True
 
     def move_towards(self, target_x, target_y, speed):
         delta_x = target_x - self.x
@@ -83,8 +86,9 @@ class obj_Enemy(pygame.sprite.Sprite):
         pygame.draw.rect(self.screen, (0, 255, 0), (self.rect.x, self.rect.y + 90, current_health_width, 5))
     
     def create_basic_attack_enemy(self, BasicAttack, enemy, amount_BasicAttack, current_time, last_time, cooldown_basicAttack):
-        if current_time - last_time >= cooldown_basicAttack:
-            return BasicAttack(enemy, damage=10, speed=15, image=pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="down")
+        if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
+            if current_time - last_time >= cooldown_basicAttack:
+                return BasicAttack(enemy, damage=10, speed=15, image=pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="down")
         return None
 
 class EnemyType1(obj_Enemy):
