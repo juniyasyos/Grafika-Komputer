@@ -18,8 +18,8 @@ def load_image(image_filename):
 class obj_Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, image, screen, path, delay):
         super().__init__()
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)

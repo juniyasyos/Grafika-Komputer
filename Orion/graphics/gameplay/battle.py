@@ -152,7 +152,7 @@ class level_1(Battle):
                 EnemyType1(screen=self.screen,path=[(0, 0), (1000, 50), (self.screen_width, 200)], delay=[700, 3000, 0]),
                 EnemyType1(screen=self.screen,path=[(0, 0), (1100, 50), (self.screen_width, 200)], delay=[800, 3000, 0])
                 ],
-            "delay":[0, 12000, 10000]
+            "delay":[0, 9000, 10000]
             }
     
     def run(self):
