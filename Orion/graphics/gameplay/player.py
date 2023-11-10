@@ -2,17 +2,7 @@ import pygame
 import os
 from icecream import ic
 import threading
-
-def load_image(image_filename):
-    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
-    image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
-    
-    try:
-        image = pygame.image.load(image_path).convert_alpha()
-        return image
-    except pygame.error as e:
-        print(f"Failed to load image: {image_filename}")
-        raise e
+from .. import gameplay as gp
 
 class Player:
     def __init__(self, screen_width, screen_height, screen):
@@ -21,8 +11,8 @@ class Player:
         self.screen_height = screen_height
 
         # Load player image and get its rect
-        self.image = pygame.transform.scale(load_image("../resources/assets/Battle/PLAYER.png"), (70, 70))
-        self.image_rocket = pygame.transform.scale(load_image("../resources/assets/Battle/Rocket/Rocket_061.png"), (40, 40))
+        self.image = gp.load_image("../resources/assets/Battle/PLAYER.png",size=(100,100), colorkey=("white"))
+        self.image_rocket = gp.load_image("../resources/assets/Battle/Rocket/Rocket_061.png", scale=50)
         self.rect = self.image.get_rect()
         self.font = pygame.font.Font(None, 36)
 
@@ -40,7 +30,7 @@ class Player:
         self.shield = 50
         self.max_shield = 50
         self.regen_hp = 0.007
-        self.basic_attack_path = load_image("../resources/assets/Battle/bullet.png")
+        self.basic_attack_path = gp.load_image("../resources/assets/Battle/bullet.png", size=(40,40))
 
         # Player skills
         self.skills = {

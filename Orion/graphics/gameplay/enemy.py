@@ -3,17 +3,7 @@ from icecream import ic
 import os
 import random
 import math
-
-def load_image(image_filename):
-    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
-    image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
-
-    try:
-        image = pygame.image.load(image_path).convert_alpha()
-        return image
-    except pygame.error as e:
-        print(f"Failed to load image: {image_filename}")
-        raise e
+from .. import gameplay as gp
         
 class obj_Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, image, screen, path, delay):
@@ -35,7 +25,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.path_index = 0
         self.delay_start_time = 0
         self.speed = 5
-        self.basic_attack_path = pygame.transform.rotate(load_image("../resources/assets/Battle/bullet.png"), 180)
+        self.basic_attack_path = gp.load_image(image_filename="../resources/assets/Battle/bullet.png", rotation=180, colorkey=(255,255,255),scale=50)
         self.set_update_enemy = []
 
     def draw(self, screen):
@@ -93,5 +83,5 @@ class obj_Enemy(pygame.sprite.Sprite):
 
 class EnemyType1(obj_Enemy):
     def __init__(self, screen, path, delay, x=0, y=0):
-        image = pygame.transform.rotate(pygame.transform.scale(load_image("../resources/assets/Battle/NPC.png"), (70, 70)), 180)
+        image = gp.load_image("../resources/assets/Battle/NPC.png",size=(50,50), rotation=180, colorkey=(255,255,255))
         super().__init__(x, y, image, screen, path, delay)

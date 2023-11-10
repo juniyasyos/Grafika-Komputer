@@ -70,7 +70,7 @@ class Beranda:
         elif self.path == "Beranda/Stage":
             self.views_menu_lvl()
         elif self.path == "Battle":
-            self.screen.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0)) # Ganti Background nanti klo dah jadi
             self.battle.run()
         else:
             self.views_Beranda()

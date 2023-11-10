@@ -1,23 +1,8 @@
-import pygame
 from .player import Player
 from .enemy import obj_Enemy, EnemyType1
-from icecream import ic
-import os
-import random
-import threading
+from .. import gameplay as gp
 
-def load_image(image_filename):
-    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
-    image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
-
-    try:
-        image = pygame.image.load(image_path).convert_alpha()
-        return image
-    except pygame.error as e:
-        print(f"Failed to load image: {image_filename}")
-        raise e
-
-class Attact_Actor (pygame.sprite.Sprite):
+class Attact_Actor (gp.pygame.sprite.Sprite):
     def __init__(self, actor, damage, speed, image, direction):
         self.actor = actor
         self.damage = damage
@@ -40,26 +25,25 @@ class Attact_Actor (pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.x-10, self.rect.y))
         screen.blit(self.image, (self.rect.x+10, self.rect.y))
 
-
 class Battle:
     def __init__(self, screen, screen_width, screen_height):
         self.screen = screen
         self.screen_height = screen_height
         self.screen_width = screen_width
-        self.Enemy_image = pygame.transform.rotate(pygame.transform.scale(load_image("../resources/assets/Battle/NPC.png"), (50, 50)), 180)
-        self.start_game = pygame.time.get_ticks()
+        self.Enemy_image = gp.load_image(image_filename="../resources/assets/Battle/NPC.png", rotation=180, scale=50)
+        self.start_game = gp.pygame.time.get_ticks()
 
         # Membuat objek Player dan elemennya
         self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
-        self.player_basic_attacks = pygame.sprite.Group()
-        self.player_rocket = pygame.sprite.Group()
+        self.player_basic_attacks = gp.pygame.sprite.Group()
+        self.player_rocket = gp.pygame.sprite.Group()
 
         # Membuat objek Enemy dan elemennya
         self.Enemys = []
-        self.enemy_basic_attacks = pygame.sprite.Group()
+        self.enemy_basic_attacks = gp.pygame.sprite.Group()
 
     def run_battle(self):
-        self.current_time = pygame.time.get_ticks()
+        self.current_time = gp.pygame.time.get_ticks()
         self.player.update()                        # Gambar kembali objek pemain
         self.attack_player()                        # Update attack player
         self.attack_enemy()                         # Update attack enemy
@@ -84,7 +68,7 @@ class Battle:
     
     def cek_basic_attack(self):
         for enemy in self.Enemys:
-            enemy_basic_attack = enemy.create_basic_attack_enemy(Attact_Actor, enemy, len(self.enemy_basic_attacks), self.current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=random.randint(2000, 5000))
+            enemy_basic_attack = enemy.create_basic_attack_enemy(Attact_Actor, enemy, len(self.enemy_basic_attacks), self.current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=gp.random.randint(2000, 5000))
             if enemy_basic_attack is not None:
                 self.enemy_basic_attacks.append(enemy_basic_attack)
                 enemy.last_BasicAttack_time = self.current_time
@@ -127,7 +111,7 @@ class level_1(Battle):
     def __init__(self, screen, screen_height, screen_width):
         super().__init__(screen, screen_height, screen_width)
         self.stage_index = 0
-        self.stage_delay =  pygame.time.get_ticks()
+        self.stage_delay =  gp.pygame.time.get_ticks()
         self.stage = {
             "Stage 1" : [
                 EnemyType1(screen=self.screen,path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[0, 3000, 0]),
@@ -158,8 +142,8 @@ class level_1(Battle):
     def run(self):
         if len(self.Enemys) == 0:
             if self.stage_index+1 < len(self.stage):
-                if pygame.time.get_ticks() - self.stage_delay >= self.stage["delay"][self.stage_index]:
+                if gp.pygame.time.get_ticks() - self.stage_delay >= self.stage["delay"][self.stage_index]:
                     self.stage_index += 1
                     self.Enemys = self.stage[f"Stage {self.stage_index}"]
-                    self.stage_delay = pygame.time.get_ticks()
+                    self.stage_delay = gp.pygame.time.get_ticks()
         self.run_battle()
