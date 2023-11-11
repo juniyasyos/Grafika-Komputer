@@ -75,7 +75,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         current_health_width = (self.health / self.max_health) * self.rect.width
         pygame.draw.rect(self.screen, (0, 255, 0), (self.rect.x, self.rect.y + 90, current_health_width, 5))
     
-    def create_basic_attack_enemy(self, BasicAttack, enemy, amount_BasicAttack, current_time, last_time, cooldown_basicAttack):
+    def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack):
         if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
             if current_time - last_time >= cooldown_basicAttack:
                 return BasicAttack(enemy, damage=10, speed=15, image=pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="down")
