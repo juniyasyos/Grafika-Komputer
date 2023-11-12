@@ -23,8 +23,6 @@ class AttackActor(gp.pygame.sprite.Sprite):
             self.update_rocket()
         if self.attack_type == "laser":
             self.update_laser()
-        if self.attack_type == "Spesial":
-            self.update_spesial_attack()
 
     def update_basic_attack(self):
         if self.direction == "up":
@@ -33,16 +31,10 @@ class AttackActor(gp.pygame.sprite.Sprite):
             self.rect.y += self.speed
 
     def update_rocket(self):
-        # Implement rocket-specific update logic here
         pass
 
     def update_laser(self):
-        # Implement laser-specific update logic here
         pass
-
-    def update_spesial_attack(self):
-        if self.func is not None: 
-            self.func(self.screen)
 
 class Battle:
     def __init__(self, screen, screen_width, screen_height):
@@ -73,7 +65,12 @@ class Battle:
 
     def remove_elemen_obj(self):
         for attacks in self.player.player_basic_attacks:
-            gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
+                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
+
+        for attacks in self.player.player_double_basic_attacks[0]:
+                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
+        for attacks in self.player.player_double_basic_attacks[1]:
+                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
 
         for enemy in self.enemies:
             enemy.enemy_basic_attacks = gp.pygame.sprite.Group(
@@ -84,7 +81,10 @@ class Battle:
         if self.enemies:
             for enemy in self.enemies:
                 enemy.create_basic_attack_enemy(AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=gp.random.randint(2000, 5000))
-            self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
+            if self.player.type_basicAttack == "type_1":
+                self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
+            if self.player.type_basicAttack == "type_2":
+                self.player.create_double_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
 
     def create_enemy(self):
         for enemy in self.enemies:
@@ -94,6 +94,24 @@ class Battle:
                 enemy_attack = False
 
                 for attack in self.player.player_basic_attacks:
+                    if enemy.health <= 0:
+                        if enemy in self.enemies: 
+                            self.enemies.remove(enemy)
+                            self.player.score += 1
+                    if attack.rect.colliderect(enemy.rect):
+                        enemy.health -= self.player.damage
+                        self.player.player_basic_attacks.remove(attack)
+
+                for attack in self.player.player_double_basic_attacks[0]:
+                    if enemy.health <= 0:
+                        if enemy in self.enemies: 
+                            self.enemies.remove(enemy)
+                            self.player.score += 1
+                    if attack.rect.colliderect(enemy.rect):
+                        enemy.health -= self.player.damage
+                        self.player.player_basic_attacks.remove(attack)
+
+                for attack in self.player.player_double_basic_attacks[1]:
                     if enemy.health <= 0:
                         if enemy in self.enemies: 
                             self.enemies.remove(enemy)

@@ -27,10 +27,10 @@ class Player:
         self.max_shield = 50
         self.delay_basicAttack = 200
         self.regen_hp = 0.007
-        self.basicAttack_func = None
         self.type_basicAttack = "type_1"
-        self.basic_attack_speed = 4
-        self.player_basic_attacks = gp.pygame.sprite.Group() 
+        self.basic_attack_speed = 20
+        self.player_basic_attacks = gp.pygame.sprite.Group()
+        self.player_double_basic_attacks = [gp.pygame.sprite.Group(),gp.pygame.sprite.Group()]
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
 
         # Player skills
@@ -75,9 +75,6 @@ class Player:
         self.set_basicAttack_func()
         self.screen.blit(self.image, self.rect)
 
-        for attack in self.player_basic_attacks:
-            attack.update()
-
     def skill_use(self):
         for skill_key, skill_data in self.skills.items():
             for skill_name, skill_data in skill_data.items():
@@ -93,7 +90,8 @@ class Player:
                     pass
                 if skill_name == "masif_ba":
                     self.type_basicAttack = "type_2" if skill_data["active"] else "type_1"
-                    # self.delay_basicAttack = 100 if skill_data["active"] else 200
+                    self.delay_basicAttack = 150 if skill_data["active"] else 200
+                    
 
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
                     skill_data["active"] = False
@@ -126,11 +124,26 @@ class Player:
                     speed=self.basic_attack_speed, 
                     image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
                     direction="up",
-                    attack_type="Spesial",
-                    func=self.basicAttack_func
+                    attack_type="Spesial"
                     )
                 )
             self.last_BasicAttack_time = self.current_time
+
+    def create_double_basic_attack_player(self, BasicAttack, player, last_time):
+        if self.current_time - last_time >= self.delay_basicAttack:
+            for double in self.player_double_basic_attacks:
+                double.add(
+                    BasicAttack(
+                        screen=self.screen,
+                        actor=player, 
+                        speed=self.basic_attack_speed, 
+                        image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
+                        direction="up",
+                        attack_type="Spesial"
+                        )
+                    )
+            self.last_BasicAttack_time = self.current_time
+
 
     def draw_icon_skill(self):
         for i, (skill_key, skill_data) in enumerate(self.skills.items(), start=1):
@@ -143,26 +156,15 @@ class Player:
                 self.screen.blit(text, (10, 80 + i * 60))
     
     def set_basicAttack_func(self):
-        def type_1(screen):
-            for attack in self.player_basic_attacks:
+        def move_and_draw(attacks, offset_x=0):
+            for attack in attacks:
                 attack.rect.y -= attack.speed
-                screen.blit(attack.image, (attack.rect.x, attack.rect.y))
+                self.screen.blit(attack.image, (attack.rect.x + offset_x, attack.rect.y))
 
-        def type_2(screen):
-            for index, attack in enumerate(self.player_basic_attacks):
-                if index % 2 == 0 and index != 0:
-                    attack.rect.y -= attack.speed
-                    screen.blit(attack.image, (attack.rect.x+10, attack.rect.y))
-                else:
-                    attack.rect.y -= attack.speed
-                    screen.blit(attack.image, (attack.rect.x-10, attack.rect.y))
-                
-        
-        if self.type_basicAttack == "type_1":
-            func = type_1
-        elif self.type_basicAttack == "type_2":
-            func = type_2
+        if self.type_basicAttack == "type_1" or len(self.player_basic_attacks) > 0:
+            move_and_draw(self.player_basic_attacks)
 
-        self.basicAttack_func = func
-        
+        if self.type_basicAttack == "type_2" or len(self.player_double_basic_attacks[0]) > 0:
+            move_and_draw(self.player_double_basic_attacks[0], offset_x=10)
+            move_and_draw(self.player_double_basic_attacks[1], offset_x=-10)
 
