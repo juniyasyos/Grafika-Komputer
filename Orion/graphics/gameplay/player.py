@@ -25,10 +25,12 @@ class Player:
         self.last_BasicAttack_time = 0
         self.shield = 50
         self.max_shield = 50
-        self.delay_basicAttack = 300
+        self.delay_basicAttack = 200
         self.regen_hp = 0.007
         self.basicAttack_func = None
         self.type_basicAttack = "type_1"
+        self.basic_attack_speed = 4
+        self.player_basic_attacks = gp.pygame.sprite.Group() 
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
 
         # Player skills
@@ -70,8 +72,11 @@ class Player:
         self.draw_health_bar()
         self.draw_score()
         self.draw_icon_skill()
-        self.screen.blit(self.image, self.rect)
         self.set_basicAttack_func()
+        self.screen.blit(self.image, self.rect)
+
+        for attack in self.player_basic_attacks:
+            attack.update()
 
     def skill_use(self):
         for skill_key, skill_data in self.skills.items():
@@ -86,8 +91,9 @@ class Player:
                         gp.pygame.draw.circle(self.screen, "blue", (self.rect.x + 35, self.rect.y + 25), 70)
                 if skill_name == "rocket":
                     pass
-                if skill_name == "masif_basic_attack":
-                    pass
+                if skill_name == "masif_ba":
+                    self.type_basicAttack = "type_2" if skill_data["active"] else "type_1"
+                    # self.delay_basicAttack = 100 if skill_data["active"] else 200
 
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
                     skill_data["active"] = False
@@ -113,8 +119,18 @@ class Player:
 
     def create_basic_attack_player(self, BasicAttack, player, last_time):
         if self.current_time - last_time >= self.delay_basicAttack:
-            return BasicAttack(player, damage=10, speed=20, image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="up")
-        return None
+            self.player_basic_attacks.add(
+                BasicAttack(
+                    screen=self.screen,
+                    actor=player, 
+                    speed=self.basic_attack_speed, 
+                    image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
+                    direction="up",
+                    attack_type="Spesial",
+                    func=self.basicAttack_func
+                    )
+                )
+            self.last_BasicAttack_time = self.current_time
 
     def draw_icon_skill(self):
         for i, (skill_key, skill_data) in enumerate(self.skills.items(), start=1):
@@ -127,12 +143,20 @@ class Player:
                 self.screen.blit(text, (10, 80 + i * 60))
     
     def set_basicAttack_func(self):
-        def type_1(screen, image, rect):
-            screen.blit(image, (rect.x, rect.y))
+        def type_1(screen):
+            for attack in self.player_basic_attacks:
+                attack.rect.y -= attack.speed
+                screen.blit(attack.image, (attack.rect.x, attack.rect.y))
 
-        def type_2(screen, image, rect):
-            screen.blit(image, (rect.x-10, rect.y))
-            screen.blit(image, (rect.x+10, rect.y))
+        def type_2(screen):
+            for index, attack in enumerate(self.player_basic_attacks):
+                if index % 2 == 0 and index != 0:
+                    attack.rect.y -= attack.speed
+                    screen.blit(attack.image, (attack.rect.x+10, attack.rect.y))
+                else:
+                    attack.rect.y -= attack.speed
+                    screen.blit(attack.image, (attack.rect.x-10, attack.rect.y))
+                
         
         if self.type_basicAttack == "type_1":
             func = type_1
@@ -140,4 +164,5 @@ class Player:
             func = type_2
 
         self.basicAttack_func = func
+        
 
