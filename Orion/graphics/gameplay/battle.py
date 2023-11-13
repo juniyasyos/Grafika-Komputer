@@ -128,6 +128,7 @@ class Battle:
 
                 remove_enemy = enemy.update()
                 if remove_enemy is True or enemy.path_index >= len(enemy.path):
+                    explsions = Explosion(x=enemy.rect.x, y=enemy.rect.y)
                     self.enemies.remove(enemy)
 
 class level_1(Battle):
