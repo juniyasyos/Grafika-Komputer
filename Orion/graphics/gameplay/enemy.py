@@ -34,8 +34,6 @@ class obj_Enemy(pygame.sprite.Sprite):
     
     def update(self):
         if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
-            for func_update_enemy in self.set_update_enemy: func_update_enemy()
-
             if self.path_index < len(self.path):
                 target_x, target_y = self.path[self.path_index]
                 dx = target_x - self.x
@@ -50,10 +48,9 @@ class obj_Enemy(pygame.sprite.Sprite):
                         self.delay_start_time = pygame.time.get_ticks()
                 else:
                     self.move_towards(target_x, target_y, self.speed)
-            return False
-        else:
-            return False
-        return True
+                return False
+            else:
+                return True
 
     def move_towards(self, target_x, target_y, speed):
         delta_x = target_x - self.x
@@ -82,7 +79,7 @@ class EnemyType1(obj_Enemy):
         image = gp.load_image("../resources/assets/Battle/NPC.png",size=(50,50), rotation=180, colorkey=(255,255,255))
         super().__init__(x, y, image, screen, path, delay)
         self.enemy_basic_attacks = pygame.sprite.Group()
-
+        
 
     def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack):
         if pygame.time.get_ticks() - self.last_time > self.delay_to_next_path[0]+2000:

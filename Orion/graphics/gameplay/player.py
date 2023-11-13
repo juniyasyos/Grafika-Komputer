@@ -21,7 +21,7 @@ class Player:
         self.health = 100
         self.max_health = 100
         self.score = 0
-        self.damage = 100
+        self.damage = 10
         self.last_BasicAttack_time = 0
         self.shield = 50
         self.max_shield = 50
