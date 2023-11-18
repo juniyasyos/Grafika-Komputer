@@ -38,7 +38,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 target_x, target_y = self.path[self.path_index]
                 dx = target_x - self.x
                 dy = target_y - self.y
-
+                
                 distance = dx * dx + dy * dy
 
                 tolerance_squared = 10
@@ -79,7 +79,8 @@ class EnemyType1(obj_Enemy):
         image = gp.load_image("../resources/assets/Battle/NPC.png",size=(50,50), rotation=180, colorkey=(255,255,255))
         super().__init__(x, y, image, screen, path, delay)
         self.enemy_basic_attacks = pygame.sprite.Group()
-        
+        self.health = 300
+        self.max_health = 300
 
     def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack):
         if pygame.time.get_ticks() - self.last_time > self.delay_to_next_path[0]+2000:

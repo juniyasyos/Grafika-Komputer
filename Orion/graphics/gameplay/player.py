@@ -29,8 +29,8 @@ class Player:
         self.regen_hp = 0.007
         self.type_basicAttack = "type_1"
         self.basic_attack_speed = 20
-        self.player_basic_attacks = gp.pygame.sprite.Group()
-        self.player_double_basic_attacks = [gp.pygame.sprite.Group(),gp.pygame.sprite.Group()]
+        self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(2)]
+        self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(3)]
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
 
         # Player skills
@@ -90,9 +90,11 @@ class Player:
                     pass
                 if skill_name == "masif_ba":
                     self.type_basicAttack = "type_2" if skill_data["active"] else "type_1"
-                    self.delay_basicAttack = 150 if skill_data["active"] else 200
+                    self.delay_basicAttack = 120 if skill_data["active"] else 180
+                    self.damage = 20 if skill_data["active"] else 25
+                    self.player_basic_attacks = self.player_basic_attacks_type2 if skill_data["active"] else self.player_basic_attacks_type1
                     
-
+                    
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
                     skill_data["active"] = False
 
@@ -115,23 +117,9 @@ class Player:
         text = self.font.render(f"Skor: {self.score}", True, (255, 255, 255))
         self.screen.blit(text, (10, 10))
 
-    def create_basic_attack_player(self, BasicAttack, player, last_time):
+    def createe_basic_attack_player(self, BasicAttack, player, last_time):
         if self.current_time - last_time >= self.delay_basicAttack:
-            self.player_basic_attacks.add(
-                BasicAttack(
-                    screen=self.screen,
-                    actor=player, 
-                    speed=self.basic_attack_speed, 
-                    image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
-                    direction="up",
-                    attack_type="Spesial"
-                    )
-                )
-            self.last_BasicAttack_time = self.current_time
-
-    def create_double_basic_attack_player(self, BasicAttack, player, last_time):
-        if self.current_time - last_time >= self.delay_basicAttack:
-            for double in self.player_double_basic_attacks:
+            for double in self.player_basic_attacks:
                 double.add(
                     BasicAttack(
                         screen=self.screen,
@@ -156,15 +144,11 @@ class Player:
                 self.screen.blit(text, (10, 80 + i * 60))
     
     def set_basicAttack_func(self):
-        def move_and_draw(attacks, offset_x=0):
+        def bullet_move(attacks, offset_x=0):
             for attack in attacks:
                 attack.rect.y -= attack.speed
                 self.screen.blit(attack.image, (attack.rect.x + offset_x, attack.rect.y))
 
-        if self.type_basicAttack == "type_1" or len(self.player_basic_attacks) > 0:
-            move_and_draw(self.player_basic_attacks)
-
-        if self.type_basicAttack == "type_2" or len(self.player_double_basic_attacks[0]) > 0:
-            move_and_draw(self.player_double_basic_attacks[0], offset_x=10)
-            move_and_draw(self.player_double_basic_attacks[1], offset_x=-10)
-
+        if len(self.player_basic_attacks) > 0:
+            for attacks in range(len(self.player_basic_attacks)):
+                bullet_move(self.player_basic_attacks[attacks], offset_x=(20*attacks)-(10*len(self.player_basic_attacks)//(attacks+1)))

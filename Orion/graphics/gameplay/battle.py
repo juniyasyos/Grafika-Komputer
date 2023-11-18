@@ -74,16 +74,22 @@ class Battle:
         self.image_explosion = [
             gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion3/{i+1}.png",size=(50,50), scale=2) for i in range(30)
         ]
+        self.bullet_explosions = gp.pygame.sprite.Group()
+        self.bullet_explosions_image = [
+            gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size=(15,15), scale=2) for i in range(25)
+        ]
 
     def run_battle(self):
         self.current_time = gp.pygame.time.get_ticks()
         self.explosions.update()
+        self.bullet_explosions.update()
         self.create_enemy()
         self.player.update()
         self.attack_enemy()
         self.remove_elemen_obj()
         self.cek_basic_attack()
         self.explosions.draw(self.screen)
+        self.bullet_explosions.draw(self.screen)
 
     def attack_enemy(self):
         for enemy in self.enemies:
@@ -92,13 +98,8 @@ class Battle:
                 attack.update()
 
     def remove_elemen_obj(self):
-        for attacks in self.player.player_basic_attacks:
-                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
-
-        for attacks in self.player.player_double_basic_attacks[0]:
-                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
-        for attacks in self.player.player_double_basic_attacks[1]:
-                gp.pygame.sprite.Group([attack for attack in self.player.player_basic_attacks if attack.rect.y > 0])
+        for attacks_d in self.player.player_basic_attacks:
+                gp.pygame.sprite.Group([attack for attack in attacks_d if attack.rect.y > 0])
 
         for enemy in self.enemies:
             enemy.enemy_basic_attacks = gp.pygame.sprite.Group(
@@ -109,10 +110,7 @@ class Battle:
         if self.enemies:
             for enemy in self.enemies:
                 enemy.create_basic_attack_enemy(AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time, cooldown_basicAttack=gp.random.randint(2000, 5000))
-            if self.player.type_basicAttack == "type_1":
-                self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
-            if self.player.type_basicAttack == "type_2":
-                self.player.create_double_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
+            self.player.createe_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
 
     def create_enemy(self):
         for enemy in self.enemies:
@@ -121,40 +119,25 @@ class Battle:
                 enemy.draw_health()
                 enemy_attack = False
 
-                for attack in self.player.player_basic_attacks:
-                    if enemy.health <= 0:
-                        if enemy in self.enemies: 
-                            self.explosions.add(Explosion(x=enemy.rect.x+20, y=enemy.rect.y+50, explosion_images=self.image_explosion))
-                            self.player.score += 1
-                            self.enemies.remove(enemy)
-                    if attack.rect.colliderect(enemy.rect):
-                        enemy.health -= self.player.damage
-                        self.player.player_basic_attacks.remove(attack)
-
-                for attack in self.player.player_double_basic_attacks[0]:
-                    if enemy.health <= 0:
-                        if enemy in self.enemies: 
-                            self.explosions.add(Explosion(x=enemy.rect.x+20, y=enemy.rect.y+50, explosion_images=self.image_explosion))
-                            self.player.score += 1
-                            self.enemies.remove(enemy)
-                    if attack.rect.colliderect(enemy.rect):
-                        enemy.health -= self.player.damage
-                        self.player.player_basic_attacks.remove(attack)
-
-                for attack in self.player.player_double_basic_attacks[1]:
-                    if enemy.health <= 0:
-                        if enemy in self.enemies: 
-                            self.explosions.add(Explosion(x=enemy.rect.x+20, y=enemy.rect.y+50, explosion_images=self.image_explosion))
-                            self.player.score += 1
-                            self.enemies.remove(enemy)
-                    if attack.rect.colliderect(enemy.rect):
-                        enemy.health -= self.player.damage
-                        self.player.player_basic_attacks.remove(attack)
-
+                for attacks in self.player.player_basic_attacks:
+                    for attack in attacks:
+                        if enemy.health <= 0:
+                            if enemy in self.enemies: 
+                                for jml_explosions in range(gp.random.randint(1,3)):
+                                    self.explosions.add(Explosion(x=enemy.rect.x+gp.random.randint(-50,50), y=enemy.rect.y+gp.random.randint(-50,50), explosion_images=self.image_explosion))
+                                self.player.score += 1
+                                self.enemies.remove(enemy)
+                                
+                        if attack.rect.colliderect(enemy.rect):
+                            enemy.health -= self.player.damage
+                            self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                            attacks.remove(attack)
+                            
             for enemy in self.enemies:
                 for attack in enemy.enemy_basic_attacks:
                     if attack.rect.colliderect(self.player.rect):
                         self.player.take_damage(enemy.damage)
+                        self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
                         enemy.enemy_basic_attacks.remove(attack)
 
                 remove_enemy = enemy.update()
@@ -169,27 +152,27 @@ class level_1(Battle):
         self.stage_delay =  gp.pygame.time.get_ticks()
         self.stage = {
             "Stage 1": [
-                EnemyType1(screen=self.screen, path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[2000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[3000, 3000, 0]),
+                EnemyType1(screen=self.screen, path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[1500, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[2000, 35000, 0]),
             ],
             "Stage 2": [
-                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 3000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 35000, 0]),
             ],
             "Stage 3": [
-                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (1000, 50), (self.screen_width, 200)], delay=[7000, 3000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (1100, 50), (self.screen_width, 200)], delay=[8000, 3000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (1000, 50), (self.screen_width, 200)], delay=[7000, 35000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (1100, 50), (self.screen_width, 200)], delay=[8000, 35000, 0]),
             ],
             "delay": [0, 9000, 10000]
         }
