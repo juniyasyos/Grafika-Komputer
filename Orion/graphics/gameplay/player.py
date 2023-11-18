@@ -29,8 +29,9 @@ class Player:
         self.regen_hp = 0.007
         self.type_basicAttack = "type_1"
         self.basic_attack_speed = 20
-        self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(2)]
-        self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(3)]
+        self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
+        self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
+        self.basic_attack_sisa = []
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
 
         # Player skills
@@ -91,8 +92,9 @@ class Player:
                 if skill_name == "masif_ba":
                     self.type_basicAttack = "type_2" if skill_data["active"] else "type_1"
                     self.delay_basicAttack = 120 if skill_data["active"] else 180
-                    self.damage = 20 if skill_data["active"] else 25
+                    self.damage = 24 if skill_data["active"] else 28
                     self.player_basic_attacks = self.player_basic_attacks_type2 if skill_data["active"] else self.player_basic_attacks_type1
+                    self.basic_attack_sisa = self.player_basic_attacks_type1 if skill_data["active"] else self.player_basic_attacks_type2
                     
                     
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
@@ -152,3 +154,8 @@ class Player:
         if len(self.player_basic_attacks) > 0:
             for attacks in range(len(self.player_basic_attacks)):
                 bullet_move(self.player_basic_attacks[attacks], offset_x=(20*attacks)-(10*len(self.player_basic_attacks)//(attacks+1)))
+        
+        if len(self.basic_attack_sisa) > 0:
+            for attacks in range(len(self.basic_attack_sisa)):
+                bullet_move(self.basic_attack_sisa[attacks], offset_x=(20*attacks)-(10*len(self.basic_attack_sisa)//(attacks+1)))
+            

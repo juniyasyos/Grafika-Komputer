@@ -71,13 +71,9 @@ class Battle:
         # Membuat objek Enemy dan elemennya
         self.enemies = gp.pygame.sprite.Group()
         self.explosions = gp.pygame.sprite.Group()
-        self.image_explosion = [
-            gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion3/{i+1}.png",size=(50,50), scale=2) for i in range(30)
-        ]
+        self.image_explosion = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion3/{i+1}.png",size=(50,50), scale=2) for i in range(30)]
         self.bullet_explosions = gp.pygame.sprite.Group()
-        self.bullet_explosions_image = [
-            gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size=(15,15), scale=2) for i in range(25)
-        ]
+        self.bullet_explosions_image = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size=(15,15), scale=2) for i in range(25)]
 
     def run_battle(self):
         self.current_time = gp.pygame.time.get_ticks()
@@ -123,21 +119,25 @@ class Battle:
                     for attack in attacks:
                         if enemy.health <= 0:
                             if enemy in self.enemies: 
-                                for jml_explosions in range(gp.random.randint(1,3)):
+                                for jml_explosions in range(gp.random.randint(1,2)):
                                     self.explosions.add(Explosion(x=enemy.rect.x+gp.random.randint(-50,50), y=enemy.rect.y+gp.random.randint(-50,50), explosion_images=self.image_explosion))
                                 self.player.score += 1
                                 self.enemies.remove(enemy)
                                 
                         if attack.rect.colliderect(enemy.rect):
                             enemy.health -= self.player.damage
-                            self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                            if self.player.type_basicAttack == "type_2": 
+                                self.bullet_explosions.add(Explosion(x=attack.rect.x-10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                                self.bullet_explosions.add(Explosion(x=attack.rect.x+10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                            elif self.player.type_basicAttack == "type_1":
+                                self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
                             attacks.remove(attack)
                             
             for enemy in self.enemies:
                 for attack in enemy.enemy_basic_attacks:
                     if attack.rect.colliderect(self.player.rect):
                         self.player.take_damage(enemy.damage)
-                        self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                        self.bullet_explosions.add(Explosion(x=attack.rect.x-10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
                         enemy.enemy_basic_attacks.remove(attack)
 
                 remove_enemy = enemy.update()
