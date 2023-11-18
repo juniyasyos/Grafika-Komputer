@@ -32,3 +32,5 @@ def gradient(screen,height,width,typeGradien="horiz"):
 
         # Gambar baris dengan warna gradien
         pygame.draw.line(screen, (r, g, b), (0, y), (width, y))
+
+

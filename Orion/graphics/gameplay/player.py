@@ -21,14 +21,17 @@ class Player:
         self.health = 100
         self.max_health = 100
         self.score = 0
-        self.damage = 100
+        self.damage = 10
         self.last_BasicAttack_time = 0
         self.shield = 50
         self.max_shield = 50
-        self.delay_basicAttack = 300
+        self.delay_basicAttack = 200
         self.regen_hp = 0.007
-        self.basicAttack_func = None
         self.type_basicAttack = "type_1"
+        self.basic_attack_speed = 20
+        self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
+        self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
+        self.basic_attack_sisa = []
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
 
         # Player skills
@@ -70,8 +73,8 @@ class Player:
         self.draw_health_bar()
         self.draw_score()
         self.draw_icon_skill()
-        self.screen.blit(self.image, self.rect)
         self.set_basicAttack_func()
+        self.screen.blit(self.image, self.rect)
 
     def skill_use(self):
         for skill_key, skill_data in self.skills.items():
@@ -86,9 +89,14 @@ class Player:
                         gp.pygame.draw.circle(self.screen, "blue", (self.rect.x + 35, self.rect.y + 25), 70)
                 if skill_name == "rocket":
                     pass
-                if skill_name == "masif_basic_attack":
-                    pass
-
+                if skill_name == "masif_ba":
+                    self.type_basicAttack = "type_2" if skill_data["active"] else "type_1"
+                    self.delay_basicAttack = 120 if skill_data["active"] else 180
+                    self.damage = 24 if skill_data["active"] else 28
+                    self.player_basic_attacks = self.player_basic_attacks_type2 if skill_data["active"] else self.player_basic_attacks_type1
+                    self.basic_attack_sisa = self.player_basic_attacks_type1 if skill_data["active"] else self.player_basic_attacks_type2
+                    
+                    
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
                     skill_data["active"] = False
 
@@ -111,10 +119,21 @@ class Player:
         text = self.font.render(f"Skor: {self.score}", True, (255, 255, 255))
         self.screen.blit(text, (10, 10))
 
-    def create_basic_attack_player(self, BasicAttack, player, last_time):
+    def createe_basic_attack_player(self, BasicAttack, player, last_time):
         if self.current_time - last_time >= self.delay_basicAttack:
-            return BasicAttack(player, damage=10, speed=20, image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), direction="up")
-        return None
+            for double in self.player_basic_attacks:
+                double.add(
+                    BasicAttack(
+                        screen=self.screen,
+                        actor=player, 
+                        speed=self.basic_attack_speed, 
+                        image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
+                        direction="up",
+                        attack_type="Spesial"
+                        )
+                    )
+            self.last_BasicAttack_time = self.current_time
+
 
     def draw_icon_skill(self):
         for i, (skill_key, skill_data) in enumerate(self.skills.items(), start=1):
@@ -127,17 +146,16 @@ class Player:
                 self.screen.blit(text, (10, 80 + i * 60))
     
     def set_basicAttack_func(self):
-        def type_1(screen, image, rect):
-            screen.blit(image, (rect.x, rect.y))
+        def bullet_move(attacks, offset_x=0):
+            for attack in attacks:
+                attack.rect.y -= attack.speed
+                self.screen.blit(attack.image, (attack.rect.x + offset_x, attack.rect.y))
 
-        def type_2(screen, image, rect):
-            screen.blit(image, (rect.x-10, rect.y))
-            screen.blit(image, (rect.x+10, rect.y))
+        if len(self.player_basic_attacks) > 0:
+            for attacks in range(len(self.player_basic_attacks)):
+                bullet_move(self.player_basic_attacks[attacks], offset_x=(20*attacks)-(10*len(self.player_basic_attacks)//(attacks+1)))
         
-        if self.type_basicAttack == "type_1":
-            func = type_1
-        elif self.type_basicAttack == "type_2":
-            func = type_2
-
-        self.basicAttack_func = func
-
+        if len(self.basic_attack_sisa) > 0:
+            for attacks in range(len(self.basic_attack_sisa)):
+                bullet_move(self.basic_attack_sisa[attacks], offset_x=(20*attacks)-(10*len(self.basic_attack_sisa)//(attacks+1)))
+            
