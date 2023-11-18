@@ -141,3 +141,45 @@ class level_1(Battle):
                     self.enemies = pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
                     self.stage_delay = pygame.time.get_ticks()
         self.run_battle()
+
+# Level 2
+class Level2(Battle):
+    def __init__(self, screen, screen_height, screen_width):
+        super().__init__(screen, screen_height, screen_width)
+        self.stage_index = 0
+        self.stage_delay = pygame.time.get_ticks()
+        self.stage = {
+            "Stage 1": [
+                EnemyType1(screen=self.screen, path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[2000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
+            ],
+            "Stage 2": [
+                EnemyType1(screen=self.screen, path=[(300, 50), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[0, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 50), (500, 50), (self.screen_width, 100)], delay=[2000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (90, 50), (self.screen_width, 200)], delay=[6000, 30000, 0]),
+            ],
+            "Stage 3": [
+                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[100, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (1000, 50), (self.screen_width, 200)], delay=[7000, 30000, 0]),
+                EnemyType1(screen=self.screen, path=[(0, 0), (1100, 50), (self.screen_width, 200)], delay=[8000, 30000, 0]),
+            ],
+            "delay": [0, 8000, 9000]  
+        }
+
+    def run(self):
+        if len(self.enemies) == 0:
+            if self.stage_index+1 < len(self.stage):
+                if pygame.time.get_ticks() - self.stage_delay >= self.stage["delay"][self.stage_index]:
+                    self.stage_index += 1
+                    self.enemies = pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
+                    self.stage_delay = pygame.time.get_ticks()
+        self.run_battle()
