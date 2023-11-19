@@ -85,7 +85,9 @@ class Player:
                     if skill_data["active"]:
                         self.health += self.max_health * self.regen_hp
                 if skill_name == "shield":
-                    if skill_data["active"]:
+                    if self.shield <= 0: 
+                        skill_data["active"] == False
+                    elif skill_data["active"]:
                         gp.pygame.draw.circle(self.screen, "blue", (self.rect.x + 35, self.rect.y + 25), 70)
                 if skill_name == "rocket":
                     pass
@@ -96,12 +98,11 @@ class Player:
                     self.player_basic_attacks = self.player_basic_attacks_type2 if skill_data["active"] else self.player_basic_attacks_type1
                     self.basic_attack_sisa = self.player_basic_attacks_type1 if skill_data["active"] else self.player_basic_attacks_type2
                     
-                    
                 if self.current_time - skill_data["last_used"] >= skill_data["duration"]:
                     skill_data["active"] = False
 
     def take_damage(self, damage=10):
-        if self.skills["4"]["shield"]["active"] and self.shield >= 0:
+        if self.skills["4"]["shield"]["active"] and self.shield > 0:
             self.shield -= damage
             self.shield = max(self.shield, 0)
         else:
@@ -127,8 +128,7 @@ class Player:
                         screen=self.screen,
                         actor=player, 
                         speed=self.basic_attack_speed, 
-                        image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)), 
-                        direction="up",
+                        image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)),
                         attack_type="Spesial"
                         )
                     )

@@ -24,7 +24,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.delay_to_next_path = delay
         self.path_index = 0
         self.delay_start_time = 0
-        self.speed = 5
+        self.speed = 10
         self.basic_attack_speed = 10
         self.basic_attack_image = gp.load_image(image_filename="../resources/assets/Battle/bullet.png", rotation=180, colorkey=(255,255,255),size=(16,24), scale=2)
         self.set_update_enemy = []
@@ -32,7 +32,7 @@ class obj_Enemy(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
     
-    def update(self):
+    def update_basic(self):
         if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
             if self.path_index < len(self.path):
                 target_x, target_y = self.path[self.path_index]
@@ -81,18 +81,29 @@ class EnemyType1(obj_Enemy):
         self.enemy_basic_attacks = pygame.sprite.Group()
         self.health = 300
         self.max_health = 300
+        self.basic_attack_speed = 6
 
-    def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack):
+    def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack, count_all_enemy):
         if pygame.time.get_ticks() - self.last_time > self.delay_to_next_path[0]+2000:
             if current_time - last_time >= cooldown_basicAttack:
                 self.enemy_basic_attacks.add(
                     BasicAttack(
                         screen=self.screen,
                         actor=enemy, 
-                        speed=self.basic_attack_speed, 
+                        speed=self.basic_attack_speed,
                         image=self.basic_attack_image, 
-                        direction="down"
+                        attack_type="Spesial"
                         )
                     )
                 self.last_BasicAttack_time = gp.pygame.time.get_ticks()
+    
+    def set_basicAttack_func(self):
+        for attack in self.enemy_basic_attacks.sprites():
+            attack.rect.y += attack.speed
+            self.screen.blit(attack.image, (attack.rect.x, attack.rect.y))
+            
+    def update(self):
+        self.update_basic()
+        self.set_basicAttack_func()
+
         
