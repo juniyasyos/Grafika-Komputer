@@ -34,14 +34,15 @@ class Button(gp.pygame.sprite.Sprite):
                         self.action[i](*self.parameters[i])
 
 class Beranda:
-    def __init__(self, screen, screen_width, screen_height, background):
+    def __init__(self, screen, screen_width, screen_height, window_size):
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.set_background = background
+        self.window_size = window_size
         self.path = "Beranda"
         self.battle = None
         self.buttons = gp.pygame.sprite.Group()
+        self.set_background = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         button = Button(image, pos_x, pos_y, action, parameters)
@@ -62,11 +63,13 @@ class Beranda:
     def rendering(self, height, width):
         self.screen_height = height
         self.screen_width = width
-        self.buttons.empty()
+        self.buttons.empty()        
+        self.screen.blit(self.set_background,(0,0))
 
         if self.path == "Beranda":
             self.views_Beranda()
         elif self.path == "Beranda/Stage":
+            self.set_background = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
             self.views_menu_lvl()
         elif self.path == "Battle":
             self.screen.fill((0, 0, 0)) # Ganti Background nanti klo dah jadi
@@ -89,10 +92,24 @@ class Beranda:
             elif event.type == gp.pygame.VIDEORESIZE:
                 self.screen_width = event.w
                 self.screen_height = event.h
-                self.set_background = load_image("../resources/assets/Menu/home.png")
+                self.set_background = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
         return True
+
+    def func_set_background(self, file, window_size):
+        current_directory = os.path.dirname(os.path.abspath(__file__)) 
+        image_path = os.path.join(current_directory, file) 
+    
+        try:
+            image = gp.pygame.image.load(image_path)
+            scaled_image = gp.pygame.transform.scale(image, window_size)
+            return scaled_image
+        except gp.pygame.error as e:
+            print(f"Failed to load image: {image_filename}")
+            raise e
+        
 
     def set_path(self, path):
         self.path = path
+        
     def set_Level(self, Level, parameters):
         self.battle = Level(*parameters)
