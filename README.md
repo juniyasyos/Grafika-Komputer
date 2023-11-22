@@ -39,7 +39,7 @@ Kelompok kami terdiri dari beberapa anggota, dan masing-masing memiliki tanggung
    - Peran: Grafik dan Desain Suara
    - Tugas: Mengembangkan elemen visual dan desain suara dalam permainan.
 
-4. ** Dewi Anjani **
+4. **Dewi Anjani**
    - Peran : Narator
    - Tugas : Merancang cerita dan alur dari permainan
 

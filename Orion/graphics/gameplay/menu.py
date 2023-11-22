@@ -1,7 +1,7 @@
 from .. import gameplay as gp
 import sys
 import os
-from .battle import level_1
+from .battle import Level1
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -56,7 +56,7 @@ class Beranda:
         self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 + 260, action=[self.set_path], parameters=[["Beranda"]])
 
     def views_Beranda(self):
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Battle"],[level_1, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
         self.add_button(load_image("../resources/assets/Menu/inventory_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 20)
         self.add_button(load_image("../resources/assets/Menu/exit_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 200, action=[gp.pygame.quit, sys.exit])
 
