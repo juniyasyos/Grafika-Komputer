@@ -43,7 +43,7 @@ class Explosion(gp.pygame.sprite.Sprite):
         # Memeriksa apakah sudah waktunya untuk memperbarui frame ledakan
         if now - self.last_update > self.frame_rate:
             self.last_update = now
-            self.frame += 1
+            self.frame +=  1
             
             # Memeriksa apakah sudah mencapai frame terakhir
             if self.frame == len(self.images):
@@ -52,7 +52,7 @@ class Explosion(gp.pygame.sprite.Sprite):
             else:
                 # Jika belum, memperbarui gambar dan posisi objek ledakan berdasarkan frame
                 self.image = self.images[self.frame]
-                self.rect = self.image.get_rect(center=self.rect.center)
+                self.rect = self.image.get_rect(center = self.rect.center)
 
 
 class AttackActor(gp.pygame.sprite.Sprite):
@@ -77,7 +77,7 @@ class AttackActor(gp.pygame.sprite.Sprite):
         - rect (Rect): Area persegi panjang yang mengelilingi gambar serangan,
           diatur pada posisi awal aktor.
         """
-    def __init__(self, screen, actor, speed, image, attack_type="basic", func=None):
+    def __init__(self, screen, actor, speed, image, attack_type = "basic", func = None):
         super().__init__()
         self.screen = screen
         self.actor = actor
@@ -141,12 +141,12 @@ class Battle:
 
         # Elemen global
         self.explosions = gp.pygame.sprite.Group()
-        self.image_explosion = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion3/{i+1}.png",size=(50,50), scale=2) for i in range(30)]
+        self.image_explosion = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion3/{i+1}.png",size = (50,50), scale = 2) for i in range(30)]
         self.bullet_explosions = gp.pygame.sprite.Group()
-        self.bullet_explosions_image = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size=(15,15), scale=2) for i in range(25)]
+        self.bullet_explosions_image = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size = (15,15), scale = 2) for i in range(25)]
         
         # Membuat objek Player dan elemennya
-        self.player = Player(self.screen_width, self.screen_height, screen=self.screen)
+        self.player = Player(self.screen_width, self.screen_height, screen = self.screen)
 
         # Membuat objek Enemy dan elemennya
         self.enemies = gp.pygame.sprite.Group()
@@ -198,8 +198,8 @@ class Battle:
                 # Membuat serangan musuh dengan parameter yang sesuai
                 enemy.create_basic_attack_enemy(
                     AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time,
-                    cooldown_basicAttack=gp.random.randint(2000, 5000),
-                    count_all_enemy=len(self.enemies)
+                    cooldown_basicAttack = gp.random.randint(2000, 5000),
+                    count_all_enemy = len(self.enemies)
                 )
             
             # Membuat serangan player dengan parameter yang sesuai
@@ -218,7 +218,7 @@ class Battle:
         """
         for enemy in self.enemies:
             # Mengecek apakah sudah waktunya untuk menggambar musuh
-            if self.current_time - self.start_game >= enemy.delay_to_next_path[0]:
+            if self.current_time - self.start_game >=  enemy.delay_to_next_path[0]:
                 
                 # Menggambar musuh dan memperbarui tampilan kesehatan musuh
                 enemy.draw(self.screen)
@@ -228,22 +228,22 @@ class Battle:
                 # Menangani serangan player terhadap musuh
                 for attacks in self.player.player_basic_attacks:
                     for attack in attacks:
-                        if enemy.health <= 0:
+                        if enemy.health <=  0:
                             # Menangani ledakan dan menghapus musuh jika kesehatan habis
                             if enemy in self.enemies: 
                                 for jml_explosions in range(gp.random.randint(1, 2)):
-                                    self.explosions.add(Explosion(x=enemy.rect.x+gp.random.randint(-50, 50), y=enemy.rect.y+gp.random.randint(-50, 50), explosion_images=self.image_explosion))
-                                self.player.score += 1
+                                    self.explosions.add(Explosion(x = enemy.rect.x+gp.random.randint(-50, 50), y = enemy.rect.y+gp.random.randint(-50, 50), explosion_images = self.image_explosion))
+                                self.player.score +=  1
                                 self.enemies.remove(enemy)
 
                         # Menangani serangan player dan efek ledakan
                         if attack.rect.colliderect(enemy.rect):
-                            enemy.health -= self.player.damage
+                            enemy.health -=  self.player.damage
                             if self.player.type_basicAttack == "type_2": 
-                                self.bullet_explosions.add(Explosion(x=attack.rect.x-10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
-                                self.bullet_explosions.add(Explosion(x=attack.rect.x+10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                                self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
+                                self.bullet_explosions.add(Explosion(x = attack.rect.x+10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
                             elif self.player.type_basicAttack == "type_1":
-                                self.bullet_explosions.add(Explosion(x=attack.rect.x, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                                self.bullet_explosions.add(Explosion(x = attack.rect.x, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
                             attacks.remove(attack)
 
             # Menangani serangan musuh terhadap player dan mengurangi kesehatan player
@@ -251,7 +251,7 @@ class Battle:
                 for attack in enemy.enemy_basic_attacks:
                     if attack.rect.colliderect(self.player.rect):
                         self.player.take_damage(enemy.damage)
-                        self.bullet_explosions.add(Explosion(x=attack.rect.x-10, y=attack.rect.y, explosion_images=self.bullet_explosions_image))
+                        self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
                         enemy.enemy_basic_attacks.remove(attack)
 
                 # Menghapus musuh dari layar jika sudah mencapai ujung jalur geraknya
@@ -293,9 +293,9 @@ class Level1(Battle):
         self.stage_delay =  gp.pygame.time.get_ticks()
         self.stage = {
             "Stage 1": [
-                EnemyType1(screen=self.screen, path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 35000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[1500, 35000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[2000, 35000, 0]),
+                EnemyType1(screen = self.screen, path = [(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay = [1000, 35000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 50), (450, 100), (self.screen_width, 100)], delay = [1500, 35000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (550, 50), (self.screen_width, 200)], delay = [2000, 35000, 0]),
             ],
             "delay": [0, 9000, 10000]
         }
@@ -314,9 +314,9 @@ class Level1(Battle):
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
-                if gp.pygame.time.get_ticks() - self.stage_delay >= self.stage["delay"][self.stage_index]:
+                if gp.pygame.time.get_ticks() - self.stage_delay >=  self.stage["delay"][self.stage_index]:
                     # Menyiapkan dan memulai stage berikutnya
-                    self.stage_index += 1
+                    self.stage_index +=  1
                     self.enemies = gp.pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
                     self.stage_delay = gp.pygame.time.get_ticks()
                     
@@ -358,27 +358,27 @@ class Level2(Battle):
         self.stage_delay = pygame.time.get_ticks()
         self.stage = {
             "Stage 1": [
-                EnemyType1(screen=self.screen, path=[(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay=[1000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 50), (450, 100), (self.screen_width, 100)], delay=[2000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (550, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay = [1000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 50), (450, 100), (self.screen_width, 100)], delay = [2000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (550, 50), (self.screen_width, 200)], delay = [3000, 30000, 0]),
             ],
             "Stage 2": [
-                EnemyType1(screen=self.screen, path=[(300, 50), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[0, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 50), (500, 50), (self.screen_width, 100)], delay=[2000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (90, 50), (self.screen_width, 200)], delay=[6000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(300, 50), (400, 50), (self.player.rect.x, self.player.rect.y)], delay = [0, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 50), (500, 50), (self.screen_width, 100)], delay = [2000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (600, 50), (self.screen_width, 200)], delay = [3000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (700, 50), (self.screen_width, 200)], delay = [4000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (800, 50), (self.screen_width, 200)], delay = [5000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (90, 50), (self.screen_width, 200)], delay = [6000, 30000, 0]),
             ],
             "Stage 3": [
-                EnemyType1(screen=self.screen, path=[(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay=[100, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (500, 50), (self.screen_width, 100)], delay=[2000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (600, 50), (self.screen_width, 200)], delay=[3000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (700, 50), (self.screen_width, 200)], delay=[4000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (800, 50), (self.screen_width, 200)], delay=[5000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (900, 50), (self.screen_width, 200)], delay=[6000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (1000, 50), (self.screen_width, 200)], delay=[7000, 30000, 0]),
-                EnemyType1(screen=self.screen, path=[(0, 0), (1100, 50), (self.screen_width, 200)], delay=[8000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (400, 50), (self.player.rect.x, self.player.rect.y)], delay = [100, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (500, 50), (self.screen_width, 100)], delay = [2000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (600, 50), (self.screen_width, 200)], delay = [3000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (700, 50), (self.screen_width, 200)], delay = [4000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (800, 50), (self.screen_width, 200)], delay = [5000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (900, 50), (self.screen_width, 200)], delay = [6000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (1000, 50), (self.screen_width, 200)], delay = [7000, 30000, 0]),
+                EnemyType1(screen = self.screen, path = [(0, 0), (1100, 50), (self.screen_width, 200)], delay = [8000, 30000, 0]),
             ],
             "delay": [0, 8000, 9000]  
         }
@@ -397,9 +397,9 @@ class Level2(Battle):
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
-                if gp.pygame.time.get_ticks() - self.stage_delay >= self.stage["delay"][self.stage_index]:
+                if gp.pygame.time.get_ticks() - self.stage_delay >=  self.stage["delay"][self.stage_index]:
                     # Menyiapkan dan memulai stage berikutnya
-                    self.stage_index += 1
+                    self.stage_index +=  1
                     self.enemies = gp.pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
                     self.stage_delay = gp.pygame.time.get_ticks()
                     

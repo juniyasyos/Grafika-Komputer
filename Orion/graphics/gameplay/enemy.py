@@ -75,7 +75,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.delay_start_time = 0
         self.speed = 10
         self.basic_attack_speed = 10
-        self.basic_attack_image = gp.load_image(image_filename="../resources/assets/Battle/bullet.png", rotation=180, colorkey=(255,255,255),size=(16,24), scale=2)
+        self.basic_attack_image = gp.load_image(image_filename = "../resources/assets/Battle/bullet.png", rotation = 180, colorkey = (255,255,255),size = (16,24), scale = 2)
         self.set_update_enemy = []
 
     def draw(self, screen):
@@ -88,7 +88,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         """
         
         # Memeriksa apakah sudah waktunya untuk berpindah ke titik jalur gerak berikutnya
-        if pygame.time.get_ticks() - self.last_time >= self.delay_to_next_path[0]:
+        if pygame.time.get_ticks() - self.last_time >=  self.delay_to_next_path[0]:
             
             # Memeriksa apakah masih ada titik jalur gerak berikutnya
             if self.path_index < len(self.path):
@@ -106,7 +106,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 if distance < tolerance_squared:
                     # Memeriksa apakah sudah waktunya untuk berpindah ke titik jalur gerak berikutnya
                     if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
-                        self.path_index += 1
+                        self.path_index +=  1
                         self.delay_start_time = pygame.time.get_ticks()
                 else:
                     # Memperbarui pergerakan musuh menuju titik tujuan
@@ -130,17 +130,17 @@ class obj_Enemy(pygame.sprite.Sprite):
         distance = math.sqrt(delta_x ** 2 + delta_y ** 2)
         
         # Memastikan tidak ada pembagian dengan nol
-        if distance != 0:
-            delta_x /= distance
-            delta_y /= distance
+        if distance !=  0:
+            delta_x /=  distance
+            delta_y /=  distance
         
         # Menghitung perpindahan berdasarkan arah dan kecepatan
         move_x = delta_x * speed
         move_y = delta_y * speed
 
         # Memperbarui posisi musuh
-        self.x += move_x
-        self.y += move_y
+        self.x +=  move_x
+        self.y +=  move_y
         
         # Memperbarui posisi rect (kotak batas) musuh
         self.rect.topleft = (int(self.x), int(self.y))
@@ -185,7 +185,7 @@ class EnemyType1(obj_Enemy):
     - update(self):
         Memperbarui status musuh tipe 1.
     """
-    def __init__(self, screen, path, delay, x=0, y=0):
+    def __init__(self, screen, path, delay, x = 0, y = 0):
         """
         Inisialisasi objek musuh tipe 1.
 
@@ -196,7 +196,7 @@ class EnemyType1(obj_Enemy):
         - x (int): Koordinat x awal musuh.
         - y (int): Koordinat y awal musuh.
         """
-        image = gp.load_image("../resources/assets/Battle/NPC.png",size=(50,50), rotation=180, colorkey=(255,255,255))
+        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (50,50), rotation = 180, colorkey = (255,255,255))
         super().__init__(x, y, image, screen, path, delay)
         self.enemy_basic_attacks = pygame.sprite.Group()
         self.health = 300
@@ -220,16 +220,16 @@ class EnemyType1(obj_Enemy):
         if pygame.time.get_ticks() - self.last_time > self.delay_to_next_path[0] + 2000:
             
             # Memeriksa apakah sudah waktunya untuk menggunakan basic attack berdasarkan cooldown
-            if current_time - last_time >= cooldown_basicAttack:
+            if current_time - last_time >=  cooldown_basicAttack:
                 
                 # Membuat basic attack musuh dengan parameter yang sesuai
                 self.enemy_basic_attacks.add(
                     BasicAttack(
-                        screen=self.screen,
-                        actor=enemy, 
-                        speed=self.basic_attack_speed,
-                        image=self.basic_attack_image, 
-                        attack_type="Spesial"
+                        screen = self.screen,
+                        actor = enemy, 
+                        speed = self.basic_attack_speed,
+                        image = self.basic_attack_image, 
+                        attack_type = "Spesial"
                     )
                 )
                 
@@ -242,7 +242,7 @@ class EnemyType1(obj_Enemy):
         
         # Memindahkan basic attack musuh ke bawah sesuai dengan kecepatannya
         for attack in self.enemy_basic_attacks.sprites():
-            attack.rect.y += attack.speed
+            attack.rect.y +=  attack.speed
             
             # Menampilkan basic attack musuh di layar
             self.screen.blit(attack.image, (attack.rect.x, attack.rect.y))
