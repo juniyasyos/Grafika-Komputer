@@ -87,17 +87,19 @@ class Views:
         """
         Menampilkan tampilan menu level.
         """
-        gp.pygame.draw.rect(self.screen, 'silver', (self.screen_width // 6 + 400, self.screen_height // 6, self.screen_width // 1.5 - 400, self.screen_height // 1.5 + 100), border_radius=10)
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 - 160, action=[self.set_path], parameters=[["Battle"]])
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 - 70, action=[self.set_path], parameters=[["Battle"]])
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 + 20, action=[self.set_path], parameters=[["Battle"]])
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 2, self.screen_height // 2 + 260, action=[self.set_path], parameters=[["Views"]])
-
+        # gp.pygame.draw.rect(self.screen, 'silver', (self.screen_width // 6 + 400, self.screen_height // 6, self.screen_width // 1.5 - 400, self.screen_height // 1.5 + 100), border_radius=10)
+        self.add_button(load_image("../resources/assets/level select/button lvl 1.png"), self.screen_width // 4.2, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 4.2, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/button lvl 2.png"), self.screen_width // 2.2, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 2.2, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/button lvl 3.png"), self.screen_width // 1.5, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 1.5, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
+        
     def views_Views(self):
         """
         Menampilkan tampilan Views.
         """
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Views/Stage"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
         self.add_button(load_image("../resources/assets/Menu/inventory_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 20)
         self.add_button(load_image("../resources/assets/Menu/exit_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 200, action=[gp.pygame.quit, sys.exit])
 
