@@ -1,7 +1,7 @@
 from .. import gameplay as gp
 import sys
 import os
-from .battle import Level1
+from .battle import Level1, Level2
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -66,8 +66,10 @@ class Views:
         self.window_size = window_size
         self.path = "Views"
         self.battle = None
+        self.background_battle = None
         self.buttons = gp.pygame.sprite.Group()
-        self.set_background = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
+        self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
+        self.set_background = self.background_home
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
@@ -121,16 +123,16 @@ class Views:
 
         # Menggambar latar belakang
         self.screen.blit(self.set_background, (0, 0))
+        
 
         # Menentukan tindakan berdasarkan path
         if self.path == "Views":
             self.views_Views()
         elif self.path == "Views/Stage":
-            self.set_background = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
             self.views_menu_lvl()
         elif self.path == "Battle":
-            self.screen.fill((0, 0, 0))  # Ganti Background nanti klo dah jadi
             self.battle.run()
+            self.set_background = self.background_battle
         else:
             self.views_Views()
 
@@ -153,7 +155,7 @@ class Views:
                 # Menangani perubahan ukuran layar
                 self.screen_width = event.w
                 self.screen_height = event.h
-                self.set_background = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
+                self.set_background = self.background_home
 
         # Mengembalikan True agar permainan tetap berjalan
         return True
@@ -174,7 +176,7 @@ class Views:
         image_path = os.path.join(current_directory, file) 
     
         try:
-            image = gp.pygame.image.load(image_path)
+            image = gp.pygame.image.load(image_path).convert()
             scaled_image = gp.pygame.transform.scale(image, window_size)
             return scaled_image
         except gp.pygame.error as e:
@@ -200,3 +202,5 @@ class Views:
         - parameters (list): Daftar parameter level.
         """
         self.battle = Level(*parameters)
+        # merubah background battle sesuai dengan level
+        self.background_battle = self.func_set_background(self.battle.path_image_background, self.window_size)

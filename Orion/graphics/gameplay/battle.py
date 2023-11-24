@@ -314,6 +314,7 @@ class Level1(Battle):
         super().__init__(screen, screen_height, screen_width)
         self.stage_index = 0
         self.stage_delay =  gp.pygame.time.get_ticks()
+        self.path_image_background = {'bg_basic':"../resources/assets/BG battle/star 2.png", 'object':["../resources/assets/BG battle/planet 1.png", "../resources/assets/BG battle/planet 2.png"]}
         self.stage = {
             "Stage 1": [
                 EnemyType1(screen = self.screen, path = [(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay = [1000, 35000, 0]),
@@ -402,7 +403,7 @@ class Level2(Battle):
                 EnemyType1(screen = self.screen, path = [(0, 0), (1000, 50), (self.screen_width, 200)], delay = [7000, 30000, 0]),
                 EnemyType1(screen = self.screen, path = [(0, 0), (1100, 50), (self.screen_width, 200)], delay = [8000, 30000, 0]),
             ],
-            "delay": [0, 8000, 9000]  
+            "delay": [0, 8000, 9000]
         }
 
     def run(self):
