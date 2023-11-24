@@ -19,6 +19,9 @@ class Explosion(gp.pygame.sprite.Sprite):
         - frame (int): Indeks gambar ledakan saat ini.
         - last_update (int): Waktu terakhir pembaruan frame.
         - frame_rate (int): Kecepatan perubahan frame (milidetik).
+        
+        Methods:
+        - update (self) : memperbarui objek ledakan.
         """
         
         super().__init__()
@@ -29,6 +32,7 @@ class Explosion(gp.pygame.sprite.Sprite):
         self.frame = 0
         self.last_update = gp.pygame.time.get_ticks()
         self.frame_rate = 50
+
 
     def update(self):
         """
@@ -76,8 +80,14 @@ class AttackActor(gp.pygame.sprite.Sprite):
         - func (function): Fungsi khusus terkait serangan.
         - rect (Rect): Area persegi panjang yang mengelilingi gambar serangan,
           diatur pada posisi awal aktor.
+          
+        Methods:
+        - update (self) : update semua serangan yang dimiliki oleh user kecuali basic attack
+        - update_rocket (self) : update serangan khusus roket penjelajah
+        - update_laser (self) : update serangan basic attack tanpa celah
         """
-    def __init__(self, screen, actor, speed, image, attack_type = "basic", func = None):
+        
+    def __init__(self, screen, actor, speed, image, attack_type="basic", func = None, target_position=(0,0)):
         super().__init__()
         self.screen = screen
         self.actor = actor
@@ -112,6 +122,7 @@ class AttackActor(gp.pygame.sprite.Sprite):
         """
         pass
 
+
 class Battle:
     def __init__(self, screen, screen_width, screen_height):
         """
@@ -133,6 +144,13 @@ class Battle:
         - image_explosion (list): Daftar gambar ledakan.
         - bullet_explosions (Group): Grup objek ledakan peluru.
         - bullet_explosions_image (list): Daftar gambar ledakan peluru.
+        
+        Methods:
+        - run_battle (self): 
+        - enemy_update (self):  
+        - remove_elemen_obj (self):  
+        - cek_actor_attack (self):  
+        - create_enemy (self):  
         """
         self.screen = screen
         self.screen_height = screen_height
@@ -151,7 +169,10 @@ class Battle:
         # Membuat objek Enemy dan elemennya
         self.enemies = gp.pygame.sprite.Group()
 
+
     def run_battle(self):
+        self.position_player = (self.player.rect.x, self.player.rect.y) # Mengambil posisi player saat ini
+        self.position_enemys = list(map(lambda enemy: (enemy.rect.x, enemy.rect.y), self.enemies)) # List yang menampung posisi dari semua enemy
         self.current_time = gp.pygame.time.get_ticks()
         self.explosions.update()
         self.bullet_explosions.update()
@@ -159,9 +180,10 @@ class Battle:
         self.player.update()
         self.enemy_update()
         self.remove_elemen_obj()
-        self.cek_basic_attack()
+        self.cek_actor_attack()
         self.explosions.draw(self.screen)
         self.bullet_explosions.draw(self.screen)
+
 
     def enemy_update(self):
         """
@@ -169,6 +191,7 @@ class Battle:
         """
         for enemy in self.enemies:
             enemy.update()
+
 
     def remove_elemen_obj(self):
         """
@@ -188,7 +211,7 @@ class Battle:
             )
 
 
-    def cek_basic_attack(self):
+    def cek_actor_attack(self):
         """
         Mengecek dan membuat serangan dasar baik dari player maupun musuh.
         """
@@ -322,7 +345,6 @@ class Level1(Battle):
                     
         # Menjalankan pertarungan
         self.run_battle()
-
 
 
 # Level 2
