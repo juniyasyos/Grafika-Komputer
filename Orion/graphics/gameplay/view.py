@@ -69,6 +69,7 @@ class Views:
         self.background_battle = None
         self.buttons = gp.pygame.sprite.Group()
         self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
+        self.background_select_lvl = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
         self.set_background = self.background_home
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
@@ -89,15 +90,14 @@ class Views:
         """
         Menampilkan tampilan menu level.
         """
-        # gp.pygame.draw.rect(self.screen, 'silver', (self.screen_width // 6 + 400, self.screen_height // 6, self.screen_width // 1.5 - 400, self.screen_height // 1.5 + 100), border_radius=10)
-        self.add_button(load_image("../resources/assets/level select/button lvl 1.png"), self.screen_width // 4.2, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 4.2, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
-        self.add_button(load_image("../resources/assets/level select/button lvl 2.png"), self.screen_width // 2.2, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 2.2, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
-        self.add_button(load_image("../resources/assets/level select/button lvl 3.png"), self.screen_width // 1.5, self.screen_height // 1.9 - 160, action=[self.set_path], parameters=[["Views"]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 1.5, self.screen_height // 1.7 - 70, action=[self.set_path], parameters=[["Views"]])
+        self.add_button(load_image("../resources/assets/level select/button lvl 1.png"), self.screen_width // 4.2, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 4.2, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level2, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/level select/button lvl 2.png"), self.screen_width // 2.2, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level2, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 2.2, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/level select/button lvl 3.png"), self.screen_width // 1.5, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
+        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 1.5, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
         
-    def views_Views(self):
+    def Beranda(self):
         """
         Menampilkan tampilan Views.
         """
@@ -129,14 +129,15 @@ class Views:
 
         # Menentukan tindakan berdasarkan path
         if self.path == "Views":
-            self.views_Views()
+            self.Beranda()
         elif self.path == "Views/Stage":
             self.views_menu_lvl()
+            self.set_background = self.background_select_lvl
         elif self.path == "Battle":
             self.battle.run()
             self.set_background = self.background_battle
         else:
-            self.views_Views()
+            self.Beranda()
 
         # Memperbarui grup tombol
         self.buttons.update()
