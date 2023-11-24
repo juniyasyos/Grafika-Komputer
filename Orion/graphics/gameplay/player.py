@@ -37,13 +37,13 @@ class Player:
     - current_time (int): Waktu sekarang dalam permainan.
 
     Methods:
-    - handle_events(self): Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
     - update(self): Memperbarui status player.
+    - handle_events(self): Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
     - skill_use(self): Menggunakan dan memproses efek skill player.
     - take_damage(self, damage=10): Mengurangi kesehatan atau pelindung player berdasarkan jumlah kerusakan.
     - draw_health_bar(self): Menampilkan indikator kesehatan dan pelindung player di layar.
     - draw_score(self): Menampilkan skor player di layar.
-    - createe_basic_attack_player(self, BasicAttack, player, last_time): Membuat basic attack player.
+    - create_basic_attack_player(self, BasicAttack, player, last_time): Membuat basic attack player.
     - draw_icon_skill(self): Menampilkan ikon dan cooldown skill di layar.
     - set_basicAttack_func(self): Menetapkan fungsi untuk menampilkan basic attack player di layar.
     """
@@ -77,16 +77,20 @@ class Player:
         self.score = 0
         self.damage = 10
         self.last_BasicAttack_time = 0
+        self.last_RocketAttack_time = 0
         self.shield = 50
         self.max_shield = 50
         self.delay_basicAttack = 200
+        self.delay_rocketAttack = 200
         self.regen_hp = 0.007
         self.type_basicAttack = "type_1"
         self.basic_attack_speed = 20
+        self.player_rocket_attacks = gp.pygame.sprite.Group()
         self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
         self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
         self.available_basic_attacks = []
-        self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png")
+        self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png", scale=3)
+        self.rocket_attack_path = gp.load_image("../resources/assets/Battle/Rocket/Rocket_110.png", rotation=-90, size=(3,9))
 
         # Player skills
         self.skills = {
@@ -96,7 +100,26 @@ class Player:
             "4": {"shield": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
             "SPACE": {"regen": {"active": False, "cooldown": 30000, "duration": 2000, "last_used": 0, "used": 0}}
         }
-
+    
+    #  Memperbarui status player.
+    def update(self):
+        """Memperbarui status player."""
+        
+        # Mendapatkan waktu saat ini
+        self.current_time = gp.pygame.time.get_ticks()
+        
+        # Menangani input pengguna, menggunakan skill, dan menggambar elemen UI
+        self.handle_events()
+        self.skill_use()
+        self.draw_health_bar()
+        self.draw_score()
+        self.draw_icon_skill()
+        
+        # Mengatur fungsi basic attack dan menampilkan player di layar
+        self.set_basicAttack_func()
+        self.screen.blit(self.image, self.rect)
+    
+    # Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
     def handle_events(self):
         """Menangani input pengguna untuk menggerakkan player dan menggunakan skill."""
         
@@ -125,24 +148,7 @@ class Player:
         self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
         self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
 
-
-    def update(self):
-        """Memperbarui status player."""
-        
-        # Mendapatkan waktu saat ini
-        self.current_time = gp.pygame.time.get_ticks()
-        
-        # Menangani input pengguna, menggunakan skill, dan menggambar elemen UI
-        self.handle_events()
-        self.skill_use()
-        self.draw_health_bar()
-        self.draw_score()
-        self.draw_icon_skill()
-        
-        # Mengatur fungsi basic attack dan menampilkan player di layar
-        self.set_basicAttack_func()
-        self.screen.blit(self.image, self.rect)
-
+    # Menggunakan dan memproses efek skill player.
     def skill_use(self):
         """Menggunakan dan memproses efek skill player."""
         
@@ -182,7 +188,7 @@ class Player:
                 if self.current_time - skill_info["last_used"] >= skill_info["duration"]:
                     skill_info["active"] = False
 
-    
+    # Mengurangi kesehatan atau pelindung player berdasarkan jumlah kerusakan.
     def take_damage(self, damage=10):
         """Mengurangi kesehatan atau pelindung player berdasarkan jumlah kerusakan."""
         
@@ -196,7 +202,7 @@ class Player:
             self.health -= damage
             self.health = max(self.health, 0)
 
-
+    # Menampilkan indikator kesehatan dan pelindung player di layar.
     def draw_health_bar(self):
         """Menampilkan indikator kesehatan dan pelindung player di layar."""
         
@@ -209,7 +215,7 @@ class Player:
         current_health_width = (show[0] / show[1]) * self.rect.width
         gp.pygame.draw.rect(self.screen, color[1], (self.rect.x, self.rect.y - 10, current_health_width, 5))
 
-
+    # Menampilkan skor player di layar.
     def draw_score(self):
         """Menampilkan skor player di layar."""
         
@@ -218,30 +224,48 @@ class Player:
         
         # Menampilkan teks skor di koordinat (10, 10)
         self.screen.blit(text, (10, 10))
-
-    def create_basic_attack_player(self, BasicAttack, player, last_time):
+        
+    # Membuat basic attack player.
+    def create_basic_attack_player(self, AttackActor, player, last_time):
         """Membuat basic attack player."""
         
-        # Memeriksa apakah sudah waktunya untuk membuat basic attack baru
+        # Memeriksa apakah sudah waktunya untuk membuat basic attack baru  
         if self.current_time - last_time >= self.delay_basicAttack:
             
             # Membuat basic attack baru untuk setiap elemen dalam player_basic_attacks
             for double in self.player_basic_attacks:
                 double.add(
-                    BasicAttack(
+                    AttackActor(
                         screen=self.screen,
                         actor=player, 
                         speed=self.basic_attack_speed, 
-                        image=gp.pygame.transform.scale(self.basic_attack_path, (30, 30)),
+                        image=self.basic_attack_path,
                         attack_type="Spesial"
                     )
                 )
             
             # Memperbarui waktu terakhir basic attack
             self.last_BasicAttack_time = self.current_time
+        
+    # Membuat serangan roket player.
+    def create_rocket_attack_player(self, AttackActor, player, enemy_posisition):
+        """Membuat rocket attack player."""
+        
+        self.player_rocket_attacks.add(
+            AttackActor(
+                    screen=self.screen,
+                    actor=player,
+                    speed=self.basic_attack_speed, 
+                    image=self.rocket_attack_path,
+                    target_position=enemy_posisition,
+                    attack_type="rocket"
+                )
+            )
+            
+        # Memperbarui waktu terakhir  attack
+        self.last_RocketAttack_time = self.current_time
 
-
-
+    # Menampilkan ikon dan cooldown skill di layar.
     def draw_icon_skill(self):
         """Menampilkan ikon dan cooldown skill di layar."""
         
@@ -260,7 +284,7 @@ class Player:
                 text = self.font.render(f"{skill_name}: {cooldown}", True, "black")
                 self.screen.blit(text, (10, 80 + i * 60))
 
-    
+    # Menetapkan fungsi untuk menampilkan basic attack player di layar.
     def set_basicAttack_func(self):
         """Menetapkan fungsi untuk menampilkan basic attack player di layar."""
         
