@@ -44,7 +44,7 @@ class obj_Enemy(pygame.sprite.Sprite):
     - move_towards(self, target_x, target_y, speed): Menggerakkan musuh ke arah titik tertentu dengan kecepatan tertentu.
     - draw_health(self): Menampilkan indikator kesehatan musuh di layar.
     """
-    def __init__(self, x, y, image, screen, path, delay):
+    def __init__(self, image, screen, path, delay, x=None, y=None):
         """
         Inisialisasi objek musuh.
 
@@ -59,9 +59,12 @@ class obj_Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.x = x
         self.y = y
+        if self.x == None:
+            self.x = path[0][0]
+            self.y = path[0][1]
         self.image = image
         self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
+        self.rect.topleft = (self.x, self.y)
         self.screen = screen
         self.health = 150
         self.max_health = 150
@@ -75,7 +78,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.delay_start_time = 0
         self.speed = 10
         self.basic_attack_speed = 10
-        self.basic_attack_image = gp.load_image(image_filename = "../resources/assets/Battle/bullet.png", rotation = 180, colorkey = (255,255,255),size = (16,24), scale = 2)
+        self.basic_attack_image = gp.load_image(image_filename = "../resources/assets/Battle/Laser Sprites/02.png", rotation = 180, colorkey = (255,255,255),size = (16,24), scale = 4)
         self.set_update_enemy = []
 
     def draw(self, screen):
@@ -100,7 +103,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 distance = dx * dx + dy * dy
 
                 # Menetapkan toleransi kuadrat untuk menentukan apakah musuh sudah mencapai titik tujuan
-                tolerance_squared = 10
+                tolerance_squared = 30
                 
                 # Memeriksa apakah musuh sudah mencapai titik tujuan
                 if distance < tolerance_squared:
@@ -185,7 +188,7 @@ class EnemyType1(obj_Enemy):
     - update(self):
         Memperbarui status musuh tipe 1.
     """
-    def __init__(self, screen, path, delay, x = 0, y = 0):
+    def __init__(self, screen, path, delay, x = 0, y = 0, speed = 5):
         """
         Inisialisasi objek musuh tipe 1.
 
@@ -196,12 +199,13 @@ class EnemyType1(obj_Enemy):
         - x (int): Koordinat x awal musuh.
         - y (int): Koordinat y awal musuh.
         """
-        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (50,50), rotation = 180, colorkey = (255,255,255))
-        super().__init__(x, y, image, screen, path, delay)
+        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (40,40), rotation = 180, colorkey = (255,255,255))
+        super().__init__(image, screen, path, delay, x=x, y=y)
         self.enemy_basic_attacks = pygame.sprite.Group()
         self.health = 300
         self.max_health = 300
-        self.basic_attack_speed = 6
+        self.basic_attack_speed = 5
+        self.speed = speed
 
     def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack, count_all_enemy):
         """
@@ -235,7 +239,6 @@ class EnemyType1(obj_Enemy):
                 
                 # Memperbarui waktu terakhir basic attack
                 self.last_BasicAttack_time = gp.pygame.time.get_ticks()
-
     
     def set_basicAttack_func(self):
         """Menetapkan fungsi untuk basic attack musuh tipe 1."""
@@ -255,4 +258,27 @@ class EnemyType1(obj_Enemy):
         
         # Memperbarui pergerakan musuh sesuai jalur gerak
         self.update_basic()
-        
+    
+
+
+class EnemyType2(obj_Enemy):
+    def __init__(self):
+        """
+        Inisialisasi objek musuh tipe 1.
+
+        Parameters:
+        - screen (Surface): Layar game.
+        - path (list): Jalur gerak musuh dalam bentuk koordinat.
+        - delay (list): Waktu delay sebelum musuh mulai bergerak dan pada setiap titik jalur.
+        - x (int): Koordinat x awal musuh.
+        - y (int): Koordinat y awal musuh.
+        """
+        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (20,20), rotation = 180, colorkey = (255,255,255))
+        super().__init__(x, y, image, screen, path, delay)
+        self.enemy_basic_attacks = pygame.sprite.Group()
+        self.health = 100
+        self.max_health = 100
+        self.basic_attack_speed = 12
+    
+    def update(self):
+        self.update_basic()

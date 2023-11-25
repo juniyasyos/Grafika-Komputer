@@ -71,7 +71,7 @@ class Player:
         self.rect.bottom = screen_height - 10
 
         # Player attributes
-        self.speed = 18
+        self.speed = 0
         self.health = 100
         self.max_health = 100
         self.score = 0
@@ -82,9 +82,9 @@ class Player:
         self.max_shield = 50
         self.delay_basicAttack = 200
         self.delay_rocketAttack = 200
-        self.regen_hp = 0.007
+        self.regen_hp = 0.004
         self.type_basicAttack = "type_1"
-        self.basic_attack_speed = 20
+        self.basic_attack_speed = 15
         self.player_rocket_attacks = gp.pygame.sprite.Group()
         self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
         self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
@@ -158,7 +158,7 @@ class Player:
                 
                 # Memproses skill "speed"
                 if skill_name == "speed":
-                    self.speed = 30 if skill_info["active"] else 18
+                    self.speed = 20 if skill_info["active"] else 10
                 
                 # Memproses skill "regen" untuk pemulihan kesehatan
                 if skill_name == "regen" and not self.health > self.max_health:

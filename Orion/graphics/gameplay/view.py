@@ -90,21 +90,99 @@ class Views:
         """
         Menampilkan tampilan menu level.
         """
-        self.add_button(load_image("../resources/assets/level select/button lvl 1.png"), self.screen_width // 4.2, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 4.2, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level2, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/level select/button lvl 2.png"), self.screen_width // 2.2, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level2, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 2.2, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/level select/button lvl 3.png"), self.screen_width // 1.5, self.screen_height // 1.9 - 160, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/level select/level lock button.png"), self.screen_width // 1.5, self.screen_height // 1.7 - 70, action=[self.set_path, self.set_Level], parameters=[["Battle"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
+        data_buttons = {
+            'btn_1':{
+                'image': load_image("../resources/assets/level select/button lvl 1.png"),
+                'pos_x': self.screen_width // 4.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_2':{
+                'image': load_image("../resources/assets/level select/level lock button.png"),
+                'pos_x': self.screen_width // 2.9,
+                'pos_y': self.screen_height // 1.7 - 70,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_3':{
+                'image': load_image("../resources/assets/level select/button lvl 2.png"),
+                'pos_x': self.screen_width // 2.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_4':{
+                'image': load_image("../resources/assets/level select/button lvl 3.png"),
+                'pos_x': self.screen_width // 1.5,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_5':{
+                'image': load_image("../resources/assets/level select/level lock button.png"),
+                'pos_x': self.screen_width // 1.8,
+                'pos_y': self.screen_height // 1.7 - 70,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_play':{
+                'image': load_image("../resources/assets/level select/button play.png"),
+                'pos_x': self.screen_width // 1.5,
+                'pos_y': self.screen_height // 1.2 - 70,
+                'action': [self.set_path],
+                'parameters': [["Views"]]
+            },
+            'btn_home':{
+                'image': load_image("../resources/assets/level select/button home.png"),
+                'pos_x': self.screen_width // 6 + 60,
+                'pos_y': self.screen_height // 1.2 - 70,
+                'action': [self.set_path],
+                'parameters': [["Views"]]
+            }
+        }
+        for button in data_buttons.values():
+            self.add_button(
+                button['image'], 
+                button['pos_x'], button['pos_y'], 
+                action=button['action'], 
+                parameters=button['parameters'])
         
     def Beranda(self):
         """
         Menampilkan tampilan Views.
         """
-        self.add_button(load_image("../resources/assets/Menu/start_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 - 150, action=[self.set_path, self.set_Level], parameters=[["Views/Stage"],[Level1, [self.screen, self.screen_width, self.screen_height]]])
-        self.add_button(load_image("../resources/assets/Menu/inventory_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 20)
-        self.add_button(load_image("../resources/assets/Menu/exit_button.png"), self.screen_width // 3 + 84, self.screen_height // 2 + 200, action=[gp.pygame.quit, sys.exit])
-
+        data_buttons = {
+            'btn_start':{
+                'image':load_image("../resources/assets/Menu/start_button.png"),
+                'pos_x': self.screen_width // 3 + 84,
+                'pos_y': self.screen_height // 2 - 150,
+                'action' : [self.set_path, self.set_Level],
+                'parameters': [["Views/Stage"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_inventory':{
+                'image':load_image("../resources/assets/Menu/inventory_button.png"),
+                'pos_x': self.screen_width // 3 + 84,
+                'pos_y': self.screen_height // 2 + 20,
+                'action' : [],
+                'parameters': []
+            },
+            'btn_exit':{
+                'image':load_image("../resources/assets/Menu/exit_button.png"),
+                'pos_x': self.screen_width // 3 + 84,
+                'pos_y': self.screen_height // 2 + 200,
+                'action' : [gp.pygame.quit, sys.exit],
+                'parameters': []
+            }
+        }
+        
+        for button in data_buttons.values():
+            self.add_button(
+                button['image'], 
+                button['pos_x'], button['pos_y'], 
+                action=button['action'], 
+                parameters=button['parameters'])
+    
     def rendering(self, height, width):
         """
         Merender tampilan berdasarkan ukuran layar yang diberikan.
@@ -126,10 +204,10 @@ class Views:
         # Menggambar latar belakang
         self.screen.blit(self.set_background, (0, 0))
         
-
         # Menentukan tindakan berdasarkan path
         if self.path == "Views":
             self.Beranda()
+            self.set_background = self.background_home
         elif self.path == "Views/Stage":
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
@@ -145,10 +223,12 @@ class Views:
         # Menangani interaksi dengan tombol
         for button in self.buttons:
             if button.rect.collidepoint(gp.pygame.mouse.get_pos()):
-                gp.pygame.draw.rect(self.screen, 'cyan', button.rect, border_radius=10)
+                gp.pygame.draw.rect(self.screen, 'cyan', (button.rect.x-3, button.rect.y+5, button.rect.width, button.rect.height+5), border_radius=10)
+                self.screen.blit(button.image,[(button.rect.x, button.rect.y+6), (button.rect.width, button.rect.height)])
                 if gp.pygame.mouse.get_pressed()[0] == 1:
                     button.handle_click()
-            self.screen.blit(button.image, button.rect.topleft)
+            else:
+                self.screen.blit(button.image, button.rect.topleft)
 
         # Menangani event Pygame
         for event in gp.pygame.event.get():

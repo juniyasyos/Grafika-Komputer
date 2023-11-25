@@ -209,6 +209,9 @@ class Battle:
             enemy.enemy_basic_attacks = gp.pygame.sprite.Group(
                 [attack for attack in enemy.enemy_basic_attacks if attack.rect.y < self.screen_height]
             )
+            # menghapus musuh yang keluar dari layar
+            if (0 > enemy.rect.x > self.screen_width) or (0 > enemy.rect.y > self.screen_height):
+                enemy.kill()
 
 
     def cek_actor_attack(self):
@@ -221,7 +224,7 @@ class Battle:
                 # Membuat serangan musuh dengan parameter yang sesuai
                 enemy.create_basic_attack_enemy(
                     AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time,
-                    cooldown_basicAttack = gp.random.randint(2000, 5000),
+                    cooldown_basicAttack = gp.random.randint(5000, 10000),
                     count_all_enemy = len(self.enemies)
                 )
             
@@ -269,17 +272,15 @@ class Battle:
                                 self.bullet_explosions.add(Explosion(x = attack.rect.x, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
                             attacks.remove(attack)
 
-            # Menangani serangan musuh terhadap player dan mengurangi kesehatan player
-            for enemy in self.enemies:
-                for attack in enemy.enemy_basic_attacks:
-                    if attack.rect.colliderect(self.player.rect):
-                        self.player.take_damage(enemy.damage)
-                        self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
-                        enemy.enemy_basic_attacks.remove(attack)
+            for attack in enemy.enemy_basic_attacks:
+                if attack.rect.colliderect(self.player.rect):
+                    self.player.take_damage(enemy.damage)
+                    self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
+                    enemy.enemy_basic_attacks.remove(attack)
 
-                # Menghapus musuh dari layar jika sudah mencapai ujung jalur geraknya
-                if enemy.path_index > len(enemy.path):
-                    self.enemies.remove(enemy)
+            # Menghapus musuh dari layar jika sudah mencapai ujung jalur geraknya
+            if 0 < enemy.rect.x > self.screen_width or enemy.rect.y > self.screen_height:
+                self.enemies.remove(enemy)
 
 
 
@@ -315,14 +316,35 @@ class Level1(Battle):
         self.stage_index = 0
         self.stage_delay =  gp.pygame.time.get_ticks()
         # self.path_image_background = {'bg_basic':"../resources/assets/BG battle/star 2.png", 'object':["../resources/assets/BG battle/planet 1.png", "../resources/assets/BG battle/planet 2.png"]}
-        self.path_image_background = "../resources/assets/BG battle/bg 1.png"
+        self.path_image_background = "../resources/assets/BG battle/bg 1.png"    
+        
+        num_points = 150
+        x_values = gp.np.linspace(0, self.screen_width+1000, num_points)
+        y_values = 0.001 * (x_values - self.screen_height) ** 2 + 100
+        path_curve = list(zip(x_values, y_values))
+        
         self.stage = {
             "Stage 1": [
-                EnemyType1(screen = self.screen, path = [(100, 100), (300, 50), (self.player.rect.x, self.player.rect.y)], delay = [1000, 35000, 0]),
-                EnemyType1(screen = self.screen, path = [(0, 50), (450, 100), (self.screen_width, 100)], delay = [1500, 35000, 0]),
-                EnemyType1(screen = self.screen, path = [(0, 0), (550, 50), (self.screen_width, 200)], delay = [2000, 35000, 0]),
+                EnemyType1(screen = self.screen, path = [(901, 0), (901, 50), (self.screen_width, 100)], delay = [1800, 20000, 500], x=None, y=None),
+                EnemyType1(screen = self.screen, path = [(800, 0), (800, 100), (self.screen_width, 150)], delay = [1700, 20000, 1000], x=None, y=None),
+                EnemyType1(screen = self.screen, path = [(700, 0), (700, 150), (self.screen_width, 200)], delay = [1600, 20000, 1500], x=None, y=None), 
+                EnemyType1(screen = self.screen, path = [(600, 0), (600, 100), (self.screen_width, 250)], delay = [1700, 20000, 1000], x=None, y=None),
+                EnemyType1(screen = self.screen, path = [(501, 0), (501, 50), (self.screen_width, 300)], delay = [1800, 20000, 500], x=None, y=None),
             ],
-            "delay": [0, 9000, 10000]
+            "Stage 2": [
+                EnemyType1(screen = self.screen, path = path_curve, delay = [100,200,1000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [150,250,1500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [200,300,2000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [250,350,2500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [300,300,3000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [350,350,3500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [400,400,4000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [450,450,4500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [500,500,5000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [550,550,5500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve, delay = [600,600,6000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+            ],
+            "delay": [0, 10000]
         }
 
     def run(self):

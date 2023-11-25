@@ -3,6 +3,7 @@ import random
 import threading
 import pygame
 from icecream import ic
+import numpy as np
 
 def load_image(image_filename, size=(16,9), rotation=None, colorkey=None, scale=None):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
