@@ -314,14 +314,20 @@ class Level1(Battle):
         """
         super().__init__(screen, screen_height, screen_width)
         self.stage_index = 0
-        self.stage_delay =  gp.pygame.time.get_ticks()
+        self.path_delay =  gp.pygame.time.get_ticks()
+        self.next_stage_delay = 0
         # self.path_image_background = {'bg_basic':"../resources/assets/BG battle/star 2.png", 'object':["../resources/assets/BG battle/planet 1.png", "../resources/assets/BG battle/planet 2.png"]}
         self.path_image_background = "../resources/assets/BG battle/bg 1.png"    
         
         num_points = 150
-        x_values = gp.np.linspace(0, self.screen_width+1000, num_points)
+        x_values = gp.np.linspace(0, self.screen_width, num_points)
         y_values = 0.001 * (x_values - self.screen_height) ** 2 + 100
         path_curve = list(zip(x_values, y_values))
+        path_curve_normal = path_curve.copy()
+        
+        path_curve_reverse = path_curve.copy()
+        path_curve_reverse.reverse()
+        
         
         self.stage = {
             "Stage 1": [
@@ -332,19 +338,21 @@ class Level1(Battle):
                 EnemyType1(screen = self.screen, path = [(501, 0), (501, 50), (self.screen_width, 300)], delay = [1800, 20000, 500], x=None, y=None),
             ],
             "Stage 2": [
-                EnemyType1(screen = self.screen, path = path_curve, delay = [100,200,1000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [150,250,1500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [200,300,2000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [250,350,2500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [300,300,3000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [350,350,3500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [400,400,4000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [450,450,4500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [500,500,5000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [550,550,5500]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
-                EnemyType1(screen = self.screen, path = path_curve, delay = [600,600,6000]+[100 for _ in range(len(path_curve)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [100,200,1000]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [150,250,1500]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [200,300,2000]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [250,350,2500]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [300,300,3000]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_normal, delay = [350,350,3500]+[50 for _ in range(len(path_curve_normal)-3)], x=None, y=None),
+                
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [100,200,1000]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [150,250,1500]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [200,300,2000]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [250,350,2500]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [300,300,3000]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
+                EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [350,350,3500]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
             ],
-            "delay": [0, 10000]
+            "delay": [1000, 10000]
         }
 
     def run(self):
@@ -361,14 +369,24 @@ class Level1(Battle):
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
-                if gp.pygame.time.get_ticks() - self.stage_delay >=  self.stage["delay"][self.stage_index]:
+                current_time = gp.pygame.time.get_ticks()
+                stage_delay = self.stage["delay"][self.stage_index]
+
+                if current_time - self.next_stage_delay >= stage_delay:
                     # Menyiapkan dan memulai stage berikutnya
-                    self.stage_index +=  1
-                    self.enemies = gp.pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
-                    self.stage_delay = gp.pygame.time.get_ticks()
-                    
-        # Menjalankan pertarungan
+                    self.stage_index += 1
+                    self.enemies = gp.pygame.sprite.Group(*self.stage[f"Stage {self.stage_index}"])
+                    self.path_delay = current_time
+                    self.next_stage_delay = self.path_delay + self.stage["delay"][self.stage_index-1]
         self.run_battle()
+        
+        # event in battle
+        if self.player.health <= 0:
+            return False
+        elif self.stage_index >= len(self.stage)-1:
+            return True
+        else:
+            return None
 
 
 # Level 2
@@ -401,7 +419,7 @@ class Level2(Battle):
         """
         super().__init__(screen, screen_height, screen_width)
         self.stage_index = 0
-        self.stage_delay = gp.pygame.time.get_ticks()
+        self.path_delay = gp.pygame.time.get_ticks()
         self.path_image_background = "../resources/assets/BG battle/bg 2.png"
         self.stage = {
             "Stage 1": [
@@ -444,11 +462,11 @@ class Level2(Battle):
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
-                if gp.pygame.time.get_ticks() - self.stage_delay >=  self.stage["delay"][self.stage_index]:
+                if gp.pygame.time.get_ticks() - self.path_delay >=  self.stage["delay"][self.stage_index]:
                     # Menyiapkan dan memulai stage berikutnya
                     self.stage_index +=  1
                     self.enemies = gp.pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
-                    self.stage_delay = gp.pygame.time.get_ticks()
+                    self.path_delay = gp.pygame.time.get_ticks()
                     
         # Menjalankan pertarungan
         self.run_battle()

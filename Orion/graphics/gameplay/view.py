@@ -183,6 +183,13 @@ class Views:
                 action=button['action'], 
                 parameters=button['parameters'])
     
+    
+    def page_player_win(self):
+        pass
+    
+    def page_player_lose(self):
+        pass
+    
     def rendering(self, height, width):
         """
         Merender tampilan berdasarkan ukuran layar yang diberikan.
@@ -212,8 +219,18 @@ class Views:
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
-            self.battle.run()
-            self.set_background = self.background_battle
+            condition = self.battle.run()
+            if condition is True:
+                print("player win")
+                self.page_player_win()
+                self.path = "Player Win"
+            elif condition is False:
+                self.page_player_lose()
+                print("player lose")
+                self.path = "Player Lose"
+            else:
+                print("player bertarung")
+                self.set_background = self.background_battle
         else:
             self.Beranda()
 

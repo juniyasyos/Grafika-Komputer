@@ -80,12 +80,13 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.basic_attack_speed = 10
         self.basic_attack_image = gp.load_image(image_filename = "../resources/assets/Battle/Laser Sprites/02.png", rotation = 180, colorkey = (255,255,255),size = (16,24), scale = 4)
         self.set_update_enemy = []
+        self.angle = 0
 
     def draw(self, screen):
         """Menampilkan gambar musuh di layar."""
-        screen.blit(self.image, self.rect)
+        screen.blit(self.image, self.rect.topleft)
     
-    def update_basic(self):
+    def update_basic(self, type_enemy=None):
         """
         Memperbarui pergerakan musuh sesuai jalur gerak.
         """
@@ -114,6 +115,9 @@ class obj_Enemy(pygame.sprite.Sprite):
                 else:
                     # Memperbarui pergerakan musuh menuju titik tujuan
                     self.move_towards(target_x, target_y, self.speed)
+            
+            else:
+                self.kill()
 
 
     def move_towards(self, target_x, target_y, speed):
@@ -281,4 +285,4 @@ class EnemyType2(obj_Enemy):
         self.basic_attack_speed = 12
     
     def update(self):
-        self.update_basic()
+        self.update_basic(type_enemy=1)
