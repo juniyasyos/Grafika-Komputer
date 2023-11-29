@@ -32,18 +32,17 @@ Kelompok kami terdiri dari beberapa anggota, dan masing-masing memiliki tanggung
 1. **Ahmad Ilyas:**
    - Peran 1: Lead Developer
    - Peran 2 : Game Designer
-   - Tugas 1: Bertanggung jawab atas struktur umum permainan dan logika gameplay.
-   - Tugas 2: Merancang level, musuh, dan sistem permainan.
+   - Tugas 1 : Bertanggung jawab atas struktur umum permainan dan logika gameplay.
+   - Tugas 2 : Merancang level, musuh, dan sistem permainan.
 
 3. **Riki Yudi Prayitno Faizal Tanjung**
-   - Peran: Grafik dan Desain Suara
-   - Tugas: Mengembangkan elemen visual dan desain suara dalam permainan.
+   - Peran 1 : Grafik dan Desain Suara
+   - Peran 2 : PJ fitur sekutu
+   - Tugas 1 : Mengembangkan elemen visual dan desain suara dalam permainan.
+   - Tugas 2 : Mengembangkan sekutu player
 
 4. **Dewi Anjani**
-   - Peran : Narator
-   - Tugas : Merancang cerita dan alur dari permainan
-
-## Catatan Penting
-Pastikan untuk membaca petunjuk dan informasi di dalam game untuk mendapatkan panduan tambahan untuk mengembangkan game ini menjadi lebih baik lagi.
-
-Terima kasih telah memainkan game Orion! Semoga Anda menikmati pengalaman luar angkasa yang menegangkan ini.
+   - Peran 1 : Narator
+   - Peran 2 : Desaign tampilan Menu
+   - Tugas 1 : Merancang cerita dan alur dari permainan
+   - Tugas 2 : Mengimplementasikan design tampilan
