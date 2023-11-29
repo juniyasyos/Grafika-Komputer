@@ -462,11 +462,21 @@ class Level2(Battle):
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
-                if gp.pygame.time.get_ticks() - self.path_delay >=  self.stage["delay"][self.stage_index]:
+                current_time = gp.pygame.time.get_ticks()
+                stage_delay = self.stage["delay"][self.stage_index]
+
+                if current_time - self.next_stage_delay >= stage_delay:
                     # Menyiapkan dan memulai stage berikutnya
-                    self.stage_index +=  1
-                    self.enemies = gp.pygame.sprite.Group(self.stage[f"Stage {self.stage_index}"])
-                    self.path_delay = gp.pygame.time.get_ticks()
-                    
-        # Menjalankan pertarungan
+                    self.stage_index += 1
+                    self.enemies = gp.pygame.sprite.Group(*self.stage[f"Stage {self.stage_index}"])
+                    self.path_delay = current_time
+                    self.next_stage_delay = self.path_delay + self.stage["delay"][self.stage_index-1]
         self.run_battle()
+        
+        # event in battle
+        if self.player.health <= 0:
+            return False
+        elif self.stage_index >= len(self.stage)-1:
+            return True
+        else:
+            return None
