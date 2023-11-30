@@ -1,5 +1,5 @@
 from .player import Player
-from .enemy import obj_Enemy, EnemyType1
+from .enemy import EnemyType1, EnemyType2
 from .. import gameplay as gp
 
 class Explosion(gp.pygame.sprite.Sprite):
@@ -190,7 +190,10 @@ class Battle:
         Memperbarui setiap musuh dalam permainan.
         """
         for enemy in self.enemies:
-            enemy.update()
+            if enemy.enemy_type == "normal":
+                enemy.update()
+            elif enemy.enemy_type == "kamikaze":
+                enemy.update(self.position_player)
 
 
     def remove_elemen_obj(self):
@@ -222,11 +225,12 @@ class Battle:
         if self.enemies:
             for enemy in self.enemies:
                 # Membuat serangan musuh dengan parameter yang sesuai
-                enemy.create_basic_attack_enemy(
-                    AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time,
-                    cooldown_basicAttack = gp.random.randint(5000, 10000),
-                    count_all_enemy = len(self.enemies)
-                )
+                if enemy.enemy_type == "normal":
+                    enemy.create_basic_attack_enemy(
+                        AttackActor, enemy, self.current_time, enemy.last_BasicAttack_time,
+                        cooldown_basicAttack = gp.random.randint(5000, 10000),
+                        count_all_enemy = len(self.enemies)
+                    )
             
             # Membuat serangan player dengan parameter yang sesuai
             self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
@@ -277,6 +281,13 @@ class Battle:
                     self.player.take_damage(enemy.damage)
                     self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
                     enemy.enemy_basic_attacks.remove(attack)
+            
+            if enemy.rect.colliderect(self.player.rect):
+                for jml_explosions in range(gp.random.randint(1, 2)):
+                    self.explosions.add(Explosion(x = enemy.rect.x+gp.random.randint(-50, 50), y = enemy.rect.y+gp.random.randint(-50, 50), explosion_images = self.image_explosion))
+                self.player.take_damage(enemy.damage)
+                self.enemies.remove(enemy)
+                
 
             # Menghapus musuh dari layar jika sudah mencapai ujung jalur geraknya
             if 0 < enemy.rect.x > self.screen_width or enemy.rect.y > self.screen_height:
@@ -352,7 +363,14 @@ class Level1(Battle):
                 EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [300,300,3000]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
                 EnemyType1(screen = self.screen, path = path_curve_reverse, delay = [350,350,3500]+[50 for _ in range(len(path_curve_reverse)-3)], x=None, y=None),
             ],
-            "delay": [1000, 10000]
+            "Stage 3" : [
+                EnemyType2(screen = self.screen, path = [(901, 0), (901, 50)], delay = [1800, 2000], x=None, y=None),
+                EnemyType2(screen = self.screen, path = [(800, 0), (800, 100)], delay = [1700, 3000], x=None, y=None),
+                EnemyType2(screen = self.screen, path = [(700, 0), (700, 150)], delay = [1600, 4000], x=None, y=None), 
+                EnemyType2(screen = self.screen, path = [(600, 0), (600, 100)], delay = [1700, 3000], x=None, y=None),
+                EnemyType2(screen = self.screen, path = [(501, 0), (501, 50)], delay = [1800, 2000], x=None, y=None),
+            ],
+            "delay": [1000, 10000, 3000]
         }
 
     def run(self):
@@ -378,15 +396,19 @@ class Level1(Battle):
                     self.enemies = gp.pygame.sprite.Group(*self.stage[f"Stage {self.stage_index}"])
                     self.path_delay = current_time
                     self.next_stage_delay = self.path_delay + self.stage["delay"][self.stage_index-1]
-        self.run_battle()
+            
         
+        gp.ic(self.stage_index)
+        gp.ic(len(self.stage))
         # event in battle
         if self.player.health <= 0:
             return False
-        elif self.stage_index >= len(self.stage)-1:
+        elif self.stage_index == len(self.stage):
             return True
         else:
+            self.run_battle()
             return None
+
 
 
 # Level 2
@@ -419,6 +441,7 @@ class Level2(Battle):
         """
         super().__init__(screen, screen_height, screen_width)
         self.stage_index = 0
+        self.next_stage_delay = 0
         self.path_delay = gp.pygame.time.get_ticks()
         self.path_image_background = "../resources/assets/BG battle/bg 2.png"
         self.stage = {
@@ -474,7 +497,7 @@ class Level2(Battle):
         self.run_battle()
         
         # event in battle
-        if self.player.health <= 0:
+        if self.player.health <= 0: 
             return False
         elif self.stage_index >= len(self.stage)-1:
             return True

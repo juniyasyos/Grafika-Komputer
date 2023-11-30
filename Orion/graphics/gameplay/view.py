@@ -103,28 +103,28 @@ class Views:
                 'pos_x': self.screen_width // 2.9,
                 'pos_y': self.screen_height // 1.7 - 70,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_3':{
                 'image': load_image("../resources/assets/level select/button lvl 2.png"),
                 'pos_x': self.screen_width // 2.2,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_4':{
                 'image': load_image("../resources/assets/level select/button lvl 3.png"),
                 'pos_x': self.screen_width // 1.5,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_5':{
                 'image': load_image("../resources/assets/level select/level lock button.png"),
                 'pos_x': self.screen_width // 1.8,
                 'pos_y': self.screen_height // 1.7 - 70,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_play':{
                 'image': load_image("../resources/assets/level select/button play.png"),

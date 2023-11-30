@@ -86,7 +86,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         """Menampilkan gambar musuh di layar."""
         screen.blit(self.image, self.rect.topleft)
     
-    def update_basic(self, type_enemy=None):
+    def update_basic(self, enemy_type=None):
         """
         Memperbarui pergerakan musuh sesuai jalur gerak.
         """
@@ -104,7 +104,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 distance = dx * dx + dy * dy
 
                 # Menetapkan toleransi kuadrat untuk menentukan apakah musuh sudah mencapai titik tujuan
-                tolerance_squared = 30
+                tolerance_squared = 35
                 
                 # Memeriksa apakah musuh sudah mencapai titik tujuan
                 if distance < tolerance_squared:
@@ -117,7 +117,10 @@ class obj_Enemy(pygame.sprite.Sprite):
                     self.move_towards(target_x, target_y, self.speed)
             
             else:
-                self.kill()
+                if enemy_type != "kamikaze":
+                    self.kill()
+                else: 
+                    return True
 
 
     def move_towards(self, target_x, target_y, speed):
@@ -204,6 +207,7 @@ class EnemyType1(obj_Enemy):
         - y (int): Koordinat y awal musuh.
         """
         image = gp.load_image("../resources/assets/Battle/NPC.png",size = (40,40), rotation = 180, colorkey = (255,255,255))
+        self.enemy_type = "normal"
         super().__init__(image, screen, path, delay, x=x, y=y)
         self.enemy_basic_attacks = pygame.sprite.Group()
         self.health = 300
@@ -266,9 +270,9 @@ class EnemyType1(obj_Enemy):
 
 
 class EnemyType2(obj_Enemy):
-    def __init__(self):
+    def __init__(self, screen, path, delay, x = 0, y = 0, speed = 5):
         """
-        Inisialisasi objek musuh tipe 1.
+        Inisialisasi objek musuh tipe 2.
 
         Parameters:
         - screen (Surface): Layar game.
@@ -277,12 +281,47 @@ class EnemyType2(obj_Enemy):
         - x (int): Koordinat x awal musuh.
         - y (int): Koordinat y awal musuh.
         """
-        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (20,20), rotation = 180, colorkey = (255,255,255))
-        super().__init__(x, y, image, screen, path, delay)
+        image = gp.load_image("../resources/assets/Battle/NPC.png", size=(20, 20), rotation=180, colorkey=(255, 255, 255))
+        self.enemy_type = "kamikaze"
+        super().__init__(image, screen, path, delay, x=x, y=y)
         self.enemy_basic_attacks = pygame.sprite.Group()
         self.health = 100
         self.max_health = 100
-        self.basic_attack_speed = 12
-    
-    def update(self):
-        self.update_basic(type_enemy=1)
+        self.speed = 10
+        
+
+    def kamikaze(self, pos_player):
+        """
+        Metode untuk mengimplementasikan enemy kamikaze dengan konsep Gerak Lurus Berubah Beraturan (GLBB).
+
+        Parameters:
+        - pos_player (tuple): Koordinat pemain (x, y).
+        """
+        target_x, target_y = pos_player
+        if (target_x, target_y) != (self.rect.x, self.rect.y):
+            dx = target_x - self.rect.x
+            dy = target_y - self.rect.y
+
+            # Normalisasi vektor
+            magnitude = (dx ** 2 + dy ** 2) ** 0.5
+            normalized_dx = dx / magnitude
+            normalized_dy = dy / magnitude
+
+            # Perbarui posisi berdasarkan kecepatan
+            self.rect.x += int(self.speed * normalized_dx)
+            self.rect.y += int(self.speed * normalized_dy)
+        else:
+            self.kill()
+
+    def update(self, pos_player):
+        """
+        Metode untuk memperbarui posisi musuh.
+
+        Parameters:
+        - pos_player (tuple): Koordinat pemain (x, y).
+        - last_move (bool): Status pergerakan terakhir pemain.
+        """
+        endmove = self.update_basic(enemy_type="kamikaze")
+
+        if endmove:
+            self.kamikaze(pos_player=pos_player)
