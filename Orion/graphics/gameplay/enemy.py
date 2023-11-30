@@ -298,18 +298,23 @@ class EnemyType2(obj_Enemy):
         - pos_player (tuple): Koordinat pemain (x, y).
         """
         target_x, target_y = pos_player
+        target_x += 25
+        target_y += 25
         if (target_x, target_y) != (self.rect.x, self.rect.y):
-            dx = target_x - self.rect.x
-            dy = target_y - self.rect.y
+            try:
+                dx = target_x - self.rect.x
+                dy = target_y - self.rect.y
 
-            # Normalisasi vektor
-            magnitude = (dx ** 2 + dy ** 2) ** 0.5
-            normalized_dx = dx / magnitude
-            normalized_dy = dy / magnitude
+                # Normalisasi vektor
+                magnitude = (dx ** 2 + dy ** 2) ** 0.5
+                normalized_dx = dx / magnitude
+                normalized_dy = dy / magnitude
 
-            # Perbarui posisi berdasarkan kecepatan
-            self.rect.x += int(self.speed * normalized_dx)
-            self.rect.y += int(self.speed * normalized_dy)
+                # Perbarui posisi berdasarkan kecepatan
+                self.rect.x += int(self.speed * normalized_dx)
+                self.rect.y += int(self.speed * normalized_dy)
+            except Exception:
+                self.kill()
         else:
             self.kill()
 

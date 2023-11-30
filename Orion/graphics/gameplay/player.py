@@ -89,6 +89,8 @@ class Player:
         self.player_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
         self.player_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
         self.available_basic_attacks = []
+        self.player_win = False
+        self.handle_option = True
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png", scale=3)
         self.rocket_attack_path = gp.load_image("../resources/assets/Battle/Rocket/Rocket_110.png", rotation=-90, size=(3,9))
 
@@ -120,33 +122,36 @@ class Player:
         self.screen.blit(self.image, self.rect)
     
     # Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
-    def handle_events(self):
+    def handle_events(self, option=False):
         """Menangani input pengguna untuk menggerakkan player dan menggunakan skill."""
         
-        # Memeriksa tombol panah untuk menggerakkan player
-        keys = gp.pygame.key.get_pressed()
-        if keys[gp.pygame.K_LEFT]:
-            self.rect.x -= self.speed
-        if keys[gp.pygame.K_RIGHT]:
-            self.rect.x += self.speed
-        if keys[gp.pygame.K_UP]:
-            self.rect.y -= self.speed
-        if keys[gp.pygame.K_DOWN]:
-            self.rect.y += self.speed
+        if self.handle_option:
+            # Memeriksa tombol panah untuk menggerakkan player
+            keys = gp.pygame.key.get_pressed()
+            if keys[gp.pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[gp.pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if keys[gp.pygame.K_UP]:
+                self.rect.y -= self.speed
+            if keys[gp.pygame.K_DOWN]:
+                self.rect.y += self.speed
 
-        # Memeriksa tombol skill dan mengaktifkannya jika cooldown sudah berakhir
-        for skill_key, skill_data in self.skills.items():
-            for skill_name, skill_info in skill_data.items():
-                if keys[gp.pygame.key.key_code(skill_key)]:
-                    if self.current_time - skill_info["last_used"] >= skill_info["cooldown"] or skill_info["last_used"] == 0:
-                        if not skill_info["active"]:
-                            skill_info["last_used"] = self.current_time
-                            skill_info["active"] = True
-                            skill_info["used"] += 1
+            # Memeriksa tombol skill dan mengaktifkannya jika cooldown sudah berakhir
+            for skill_key, skill_data in self.skills.items():
+                for skill_name, skill_info in skill_data.items():
+                    if keys[gp.pygame.key.key_code(skill_key)]:
+                        if self.current_time - skill_info["last_used"] >= skill_info["cooldown"] or skill_info["last_used"] == 0:
+                            if not skill_info["active"]:
+                                skill_info["last_used"] = self.current_time
+                                skill_info["active"] = True
+                                skill_info["used"] += 1
 
-        # Memastikan player tetap berada dalam batas layar permainan
-        self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
-        self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
+            # Memastikan player tetap berada dalam batas layar permainan
+            # gp.ic(self.player_win)
+            if self.player_win is False:
+                self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
+                self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
 
     # Menggunakan dan memproses efek skill player.
     def skill_use(self):

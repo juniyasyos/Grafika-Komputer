@@ -328,7 +328,8 @@ class Level1(Battle):
         self.path_delay =  gp.pygame.time.get_ticks()
         self.next_stage_delay = 0
         # self.path_image_background = {'bg_basic':"../resources/assets/BG battle/star 2.png", 'object':["../resources/assets/BG battle/planet 1.png", "../resources/assets/BG battle/planet 2.png"]}
-        self.path_image_background = "../resources/assets/BG battle/bg 1.png"    
+        self.path_image_background = "../resources/assets/BG battle/bg 1.png"   
+        self.kill_player_delay = 0 
         
         num_points = 150
         x_values = gp.np.linspace(0, self.screen_width, num_points)
@@ -381,13 +382,14 @@ class Level1(Battle):
         - Jika sudah, memeriksa apakah masih ada stage berikutnya untuk dijalankan.
         - Jika iya, menyiapkan dan memulai stage berikutnya.
         """
-        
+
         # Memeriksa apakah musuh dalam layar sudah habis
         if len(self.enemies) == 0:
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
             if self.stage_index + 1 < len(self.stage):
                 # Memeriksa apakah sudah waktunya untuk memulai stage berikutnya
                 current_time = gp.pygame.time.get_ticks()
+                self.kill_player_delay = current_time
                 stage_delay = self.stage["delay"][self.stage_index]
 
                 if current_time - self.next_stage_delay >= stage_delay:
@@ -395,18 +397,41 @@ class Level1(Battle):
                     self.stage_index += 1
                     self.enemies = gp.pygame.sprite.Group(*self.stage[f"Stage {self.stage_index}"])
                     self.path_delay = current_time
-                    self.next_stage_delay = self.path_delay + self.stage["delay"][self.stage_index-1]
+                    self.next_stage_delay = self.path_delay + self.stage["delay"][self.stage_index - 1]
+            elif self.stage_index + 1 == len(self.stage):
+                # Eksekusi ketika stage selesai
+                current_time = gp.pygame.time.get_ticks()
+                finish_delay = 6000  # Delai sebelum player bergerak ke atas setelah stage selesai
+
+                if current_time - self.next_stage_delay >= finish_delay:
+                    self.stage_index += 1
             
+
+        # gp.ic(self.stage_index)
+        # gp.ic(len(self.stage))
         
-        gp.ic(self.stage_index)
-        gp.ic(len(self.stage))
         # event in battle
         if self.player.health <= 0:
-            return False
-        elif self.stage_index == len(self.stage):
+            current_time = gp.pygame.time.get_ticks()
+            finish_delay = 8000  # Delai sebelum player bergerak ke atas setelah stage selesai
+
+            if current_time - self.kill_player_delay >= finish_delay:
+                return False
+            else:
+                self.player.handle_option = False
+                self.run_battle()
+                self.player.player_basic_attacks.clear()
+                self.explosions.add(Explosion(x = self.player.rect.x+gp.random.randint(-30, 30)+50, y = self.player.rect.y+gp.random.randint(-30, 30)+40, explosion_images = self.image_explosion))
+            
+        elif self.stage_index > len(self.stage):
             return True
         else:
             self.run_battle()
+            if self.position_player[1] >= 0 and self.stage_index == len(self.stage):
+                self.player.rect.y -= self.player.speed
+                self.player.player_win = True
+            if self.position_player[1] < 0:
+                self.stage_index+=1
             return None
 
 
