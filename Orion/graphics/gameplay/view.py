@@ -1,7 +1,7 @@
 from .. import gameplay as gp
 import sys
 import os
-from .battle import Level1, Level2
+from .battle import Level1, Level2, Level3
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -110,21 +110,21 @@ class Views:
                 'pos_x': self.screen_width // 2.2,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_4':{
                 'image': load_image("../resources/assets/level select/button lvl 3.png"),
                 'pos_x': self.screen_width // 1.5,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level3, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_5':{
                 'image': load_image("../resources/assets/level select/level lock button.png"),
                 'pos_x': self.screen_width // 1.8,
                 'pos_y': self.screen_height // 1.7 - 70,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_play':{
                 'image': load_image("../resources/assets/level select/button play.png"),
@@ -229,7 +229,6 @@ class Views:
                 print("player lose")
                 self.path = "Player Lose"
             else:
-                print("player bertarung")
                 self.set_background = self.background_battle
         else:
             self.Beranda()
