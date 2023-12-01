@@ -311,7 +311,7 @@ class Battle:
             
             # Membuat serangan player dengan parameter yang sesuai
             self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
-
+            
 
     def create_enemy(self):
         """

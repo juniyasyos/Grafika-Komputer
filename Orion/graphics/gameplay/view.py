@@ -82,6 +82,11 @@ class Views:
             "win sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
             "battle sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/battle sound .mp3")),
         }
+        
+        for sound in self.sound_files.values():
+            sound.set_volume(0.3)
+        
+        self.sound_files["home backsound"].play(maxtime=-1)
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
@@ -149,7 +154,7 @@ class Views:
                 'pos_x': self.screen_width // 6 + 60,
                 'pos_y': self.screen_height // 1.2 - 70,
                 'action': [self.set_path],
-                'parameters': [["Views"]]
+                'parameters': [["Views",False]]
             }
         }
         for button in data_buttons.values():
@@ -169,7 +174,7 @@ class Views:
                 'pos_x': self.screen_width // 3 + 84,
                 'pos_y': self.screen_height // 2 - 150,
                 'action' : [self.set_path, self.set_Level],
-                'parameters': [["Views/Stage"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Views/Stage",False], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_inventory':{
                 'image':load_image("../resources/assets/Menu/inventory_button.png"),
@@ -225,21 +230,11 @@ class Views:
         # Menentukan tindakan berdasarkan path
         if self.path == "Views":
             self.Beranda()
-            self.sound_files['battle sound'].stop()
-            self.sound_files['home backsound'].set_volume(0.4)
-            if gp.pygame.time.get_ticks() - self.start_time >= 94000 or self.start_time_index == 0:
-                self.sound_files['home backsound'].play()
-                self.start_time_index += 1
             self.set_background = self.background_home
         elif self.path == "Views/Stage":
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
-            self.sound_files["battle sound"].set_volume(0.5)
-            self.sound_files['home backsound'].stop()
-            if gp.pygame.time.get_ticks() - self.start_time >= 520000 or self.start_time_index == 1:
-                self.sound_files["battle sound"].play()
-                self.start_time_index -= 1
             condition = self.battle.run()
             if condition is True:
                 print("player win")
@@ -303,14 +298,23 @@ class Views:
             raise e
         
 
-    def set_path(self, path):
+    def set_path(self, path, next_sound=True):
         """
         Mengatur path berdasarkan input.
 
         Parameters:
         - path (str): Path baru.
         """
+        
+        if next_sound is True:
+            for sound in self.sound_files.values():
+                sound.stop()
             
+            if path == "Views":
+                self.sound_files["home backsound"].play(maxtime=-1)
+            elif path == "Battle":
+                self.sound_files["battle sound"].play(maxtime=-1)
+        
         self.path = path
         
     def set_Level(self, Level, parameters):
@@ -324,3 +328,4 @@ class Views:
         self.battle = Level(*parameters)
         # merubah background battle sesuai dengan level
         self.background_battle = self.func_set_background(self.battle.path_image_background, self.window_size)
+

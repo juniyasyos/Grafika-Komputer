@@ -93,6 +93,8 @@ class Player:
         self.handle_option = True
         self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png", scale=3)
         self.rocket_attack_path = gp.load_image("../resources/assets/Battle/Rocket/Rocket_110.png", rotation=-90, size=(3,9))
+        self.basic_attack_sound = gp.pygame.mixer.Sound(gp.os.path.join(gp.os.path.dirname(gp.os.path.abspath(__file__)),"../resources/assets/Sound/Suara tembakan.mp3"))
+        self.basic_attack_sound.set_volume(0.1)
 
         # Player skills
         self.skills = {
@@ -236,7 +238,7 @@ class Player:
         
         # Memeriksa apakah sudah waktunya untuk membuat basic attack baru  
         if self.current_time - last_time >= self.delay_basicAttack:
-            
+            self.basic_attack_sound.play()
             # Membuat basic attack baru untuk setiap elemen dalam player_basic_attacks
             for double in self.player_basic_attacks:
                 double.add(
