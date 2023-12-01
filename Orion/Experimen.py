@@ -1,24 +1,50 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import pygame
 
-def quarter_circle(center_x, center_y, radius, num_points=100):
-    theta = np.linspace(0, np.pi / 2, num_points)
-    x = center_x + radius * np.cos(theta)
-    y = center_y + radius * np.sin(theta)
-    return x, y
+# Inisialisasi Pygame
+pygame.init()
 
-# Contoh penggunaan
-center_x, center_y = 0, 0
-radius = 5
+# Set up layar
+screen_width, screen_height = 800, 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Pygame Sound Example")
 
-x, y = quarter_circle(center_x, center_y, radius)
-print(x)
-print(y)
+# Inisialisasi suara
+pygame.mixer.init()
 
-plt.plot(x, y)
-plt.axis('equal')
-plt.title('Seperempat Lingkaran')
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.grid(True)
-plt.show()
+# Load sound files
+sound_files = {
+    pygame.K_a: pygame.mixer.Sound("graphics/resources/assets/Sound/button click.mp3"),
+    pygame.K_s: pygame.mixer.Sound("graphics/resources/assets/Sound/win sound.mp3"),
+    pygame.K_d: pygame.mixer.Sound("graphics/resources/assets/Sound/battle sound .mp3"),
+}
+
+# Inisialisasi font
+font = pygame.font.Font(None, 36)
+
+# Fungsi untuk menampilkan teks di layar
+def show_text(text, x, y):
+    text_surface = font.render(text, True, (255, 255, 255))
+    screen.blit(text_surface, (x, y))
+
+# Main loop
+clock = pygame.time.Clock()
+running = True
+while running:
+    screen.fill((0, 0, 0))
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            # Memeriksa apakah tombol yang ditekan ada dalam pemetaan suara
+            if event.key in sound_files:
+                sound_files[event.key].play()
+
+    # Menampilkan teks instruksi
+    show_text("Tekan tombol 'A', 'S', atau 'D' untuk mendengar suara!", 100, 50)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+# Berhenti pygame
+pygame.quit()

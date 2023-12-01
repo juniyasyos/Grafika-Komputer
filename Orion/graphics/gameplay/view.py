@@ -71,6 +71,17 @@ class Views:
         self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
         self.background_select_lvl = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
         self.set_background = self.background_home
+        
+        self.start_time = gp.pygame.time.get_ticks()
+        self.start_time_index = 0
+        
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        self.sound_files = {
+            "button click": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/button click.mp3")),
+            "home backsound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/home backsound.mp3")),
+            "win sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
+            "battle sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/battle sound .mp3")),
+        }
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
@@ -214,11 +225,21 @@ class Views:
         # Menentukan tindakan berdasarkan path
         if self.path == "Views":
             self.Beranda()
+            self.sound_files['battle sound'].stop()
+            self.sound_files['home backsound'].set_volume(0.4)
+            if gp.pygame.time.get_ticks() - self.start_time >= 94000 or self.start_time_index == 0:
+                self.sound_files['home backsound'].play()
+                self.start_time_index += 1
             self.set_background = self.background_home
         elif self.path == "Views/Stage":
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
+            self.sound_files["battle sound"].set_volume(0.5)
+            self.sound_files['home backsound'].stop()
+            if gp.pygame.time.get_ticks() - self.start_time >= 520000 or self.start_time_index == 1:
+                self.sound_files["battle sound"].play()
+                self.start_time_index -= 1
             condition = self.battle.run()
             if condition is True:
                 print("player win")
@@ -230,8 +251,6 @@ class Views:
                 self.path = "Player Lose"
             else:
                 self.set_background = self.background_battle
-        else:
-            self.Beranda()
 
         # Memperbarui grup tombol
         self.buttons.update()
@@ -242,6 +261,7 @@ class Views:
                 gp.pygame.draw.rect(self.screen, 'cyan', (button.rect.x-3, button.rect.y+5, button.rect.width, button.rect.height+5), border_radius=10)
                 self.screen.blit(button.image,[(button.rect.x, button.rect.y+6), (button.rect.width, button.rect.height)])
                 if gp.pygame.mouse.get_pressed()[0] == 1:
+                    self.sound_files["button click"].play()
                     button.handle_click()
             else:
                 self.screen.blit(button.image, button.rect.topleft)
@@ -290,6 +310,7 @@ class Views:
         Parameters:
         - path (str): Path baru.
         """
+            
         self.path = path
         
     def set_Level(self, Level, parameters):
