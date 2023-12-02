@@ -2,6 +2,7 @@ from .player import Player
 from .enemy import EnemyType1, EnemyType2
 from .. import gameplay as gp
 
+# Inisialisasi objek ledakan.
 class Explosion(gp.pygame.sprite.Sprite):
     def __init__(self, x, y, explosion_images):
         """
@@ -58,7 +59,7 @@ class Explosion(gp.pygame.sprite.Sprite):
                 self.image = self.images[self.frame]
                 self.rect = self.image.get_rect(center = self.rect.center)
 
-
+# Inisialisasi objek serangan actor.
 class AttackActor(gp.pygame.sprite.Sprite):
     """
         Inisialisasi objek serangan actor.
@@ -122,21 +123,23 @@ class AttackActor(gp.pygame.sprite.Sprite):
         """
         pass
 
-
+# Kelas untuk mengelola pertempuran dalam permainan.
 class Battle:
     def __init__(self, screen, screen_width, screen_height, image_background, stage):
         """
-        Inisialisasi objek pertempuran.
+        Kelas untuk mengelola pertempuran dalam permainan.
 
-        Parameters:
-        - screen (Surface): Layar game.
-        - screen_width (int): Lebar layar game.
-        - screen_height (int): Tinggi layar game.
+        Args:
+        - screen (Surface): Objek layar permainan.
+        - screen_width (int): Lebar layar permainan.
+        - screen_height (int): Tinggi layar permainan.
+        - image_background: Gambar latar belakang pertempuran.
+        - stage: Objek stage.
 
         Attributes:
-        - screen (Surface): Layar game.
-        - screen_width (int): Lebar layar game.
-        - screen_height (int): Tinggi layar game.
+        - screen (Surface): Objek layar permainan.
+        - screen_width (int): Lebar layar permainan.
+        - screen_height (int): Tinggi layar permainan.
         - start_game (int): Waktu mulai permainan.
         - player (Player): Objek player.
         - enemies (Group): Grup objek musuh.
@@ -144,18 +147,33 @@ class Battle:
         - image_explosion (list): Daftar gambar ledakan.
         - bullet_explosions (Group): Grup objek ledakan peluru.
         - bullet_explosions_image (list): Daftar gambar ledakan peluru.
-        
+        - stage_index (int): Indeks stage.
+        - __start (int): Waktu mulai looping internal.
+        - path_delay (int): Waktu tunda path.
+        - next_stage_delay (int): Waktu tunda menuju stage berikutnya.
+        - path_image_background: Gambar latar belakang path.
+        - kill_player_delay (int): Waktu tunda pembunuhan player.
+        - stage: Objek stage.
+        - sound_files (dict): File suara permainan.
+
         Methods:
-        - run_battle (self): 
-        - enemy_update (self):  
-        - remove_elemen_obj (self):  
-        - cek_actor_attack (self):  
-        - create_enemy (self):  
+        - run_battle (self): Menjalankan pertempuran.
+        - enemy_update (self): Update musuh.
+        - remove_elemen_obj (self): Menghapus elemen objek.
+        - cek_actor_attack (self): Memeriksa serangan actor.
+        - create_enemy (self): Membuat musuh baru.
         """
         self.screen = screen
         self.screen_height = screen_height
         self.screen_width = screen_width
         self.start_game = gp.pygame.time.get_ticks()
+
+        # Membuat objek Player dan elemennya
+        self.player = Player(self.screen_width, self.screen_height, screen = self.screen)
+        self.kill_player_delay = 0 
+
+        # Membuat objek Enemy dan elemennya
+        self.enemies = gp.pygame.sprite.Group()
 
         # Elemen global
         self.explosions = gp.pygame.sprite.Group()
@@ -163,29 +181,33 @@ class Battle:
         self.bullet_explosions = gp.pygame.sprite.Group()
         self.bullet_explosions_image = [gp.load_image(f"../resources/assets/Battle/Explotisions/Explosion4/{i+1}.png",size = (15,15), scale = 2) for i in range(25)]
         self.stage_index = 0
+        self.__start = 0
         self.path_delay =  gp.pygame.time.get_ticks()
         self.next_stage_delay = 0
         self.path_image_background = image_background   
-        self.kill_player_delay = 0 
         self.stage = stage
+        
+        # Elemen Suara
         current_directory = gp.os.path.dirname(gp.os.path.abspath(__file__))
         self.sound_files = {
             "win sound": gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
             "lose sound": gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/lose sound.mp3")),
             "battle sound" : gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/battle sound .mp3"))
         }
-        
         for sound in self.sound_files.values():
             sound.set_volume(0.3)
         
-        # Membuat objek Player dan elemennya
-        self.player = Player(self.screen_width, self.screen_height, screen = self.screen)
-
-        # Membuat objek Enemy dan elemennya
-        self.enemies = gp.pygame.sprite.Group()
     
     
+    # Animasi perubahan transparansi layar menjadi hitam.
     def fade_animation(self):
+        """
+        Animasi perubahan transparansi layar menjadi hitam.
+
+        Notes:
+        - Fungsi ini mengubah transparansi layar dari 0 hingga 255 dengan interval 5.
+        - Setelah itu, menghentikan semua suara.
+        """
         black_surface = gp.pygame.Surface((self.screen_width, self.screen_height))
         black_surface.fill(gp.pygame.Color("black"))
 
@@ -195,19 +217,24 @@ class Battle:
             gp.pygame.display.flip()
             gp.pygame.time.delay(4000 // (256 // 6))
 
-    
-    def run(self, play_sound):
+        for sound in self.sound_files.values():
+            sound.stop()
+
+    # Menjalankan Pertempuran.
+    def run(self, play_sound  ):
         """
-        Menjalankan level.
-        
-        - Memeriksa apakah musuh dalam layar sudah habis.
-        - Jika sudah, memeriksa apakah masih ada stage berikutnya untuk dijalankan.
-        - Jika iya, menyiapkan dan memulai stage berikutnya.
+        Menjalankan pertempuran.
+
+        Args:
+        - play_sound (bool): Status pemutaran suara.
+
+        Returns:
+        - bool: Status permainan (True jika selesai, False jika pemain kalah, None jika permainan berlanjut).
         """
         if play_sound:
             self.sound_files["battle sound"].play(maxtime=-1)
             self.play_sound = False
-        
+
         # Memeriksa apakah musuh dalam layar sudah habis
         if len(self.enemies) == 0:
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
@@ -229,41 +256,68 @@ class Battle:
 
                 if current_time - self.next_stage_delay >= finish_delay:
                     self.stage_index += 1
-            
-            
+
         if self.player.health <= 0:
             current_time = gp.pygame.time.get_ticks()
             finish_delay = 7000
             self.sound_files["battle sound"].stop()
-            self.sound_files["lose sound"].play()
-             
+            
+            if self.start == 0:
+                self.start += 1
+                self.sound_files["lose sound"].play()
+
             if current_time - self.kill_player_delay >= finish_delay:
                 return False
-            elif current_time - self.kill_player_delay >= 2500:    
+            elif current_time - self.kill_player_delay >= 2500:
                 self.sound_files["battle sound"].stop()
-                self.sound_files["win sound"].play(maxtime=1)
+                
+                if self.start == 0:
+                    self.start += 1
+                    self.sound_files["win sound"].play(maxtime=1)
+                    
                 self.fade_animation()
             else:
                 self.player.handle_option = False
                 self.run_battle()
                 self.player.player_basic_attacks.clear()
+                
                 if current_time % 20 == 0:
-                    self.explosions.add(Explosion(x = self.player.rect.x+gp.random.randint(-30, 30)+50, y = self.player.rect.y+gp.random.randint(-30, 30)+40, explosion_images = self.image_explosion))
-            
+                    self.explosions.add(Explosion(x=self.player.rect.x + gp.random.randint(-30, 30) + 50,
+                                                y=self.player.rect.y + gp.random.randint(-30, 30) + 40,
+                                                explosion_images=self.image_explosion))
+                
         elif self.stage_index > len(self.stage):
             return True
         else:
             self.run_battle()
+            self.start = 0
             self.kill_player_delay = gp.pygame.time.get_ticks()
+            
             if self.position_player[1] >= 0 and self.stage_index == len(self.stage):
                 self.player.rect.y -= self.player.speed
                 self.player.player_win = True
+            
             if self.position_player[1] < 0:
-                self.stage_index+=1
+                self.stage_index += 1
+                
             return None
-    
 
+    # Menjalankan update pertempuran.
     def run_battle(self):
+        """
+        Menjalankan update pertempuran.
+
+        Notes:
+        - Memperbarui posisi player dan musuh.
+        - Memperbarui waktu saat ini.
+        - Memperbarui elemen ledakan.
+        - Membuat musuh baru.
+        - Memperbarui player.
+        - Memperbarui musuh.
+        - Menghapus elemen objek yang tidak diperlukan.
+        - Memeriksa serangan actor.
+        - Menampilkan ledakan pada layar.
+        """
         self.position_player = (self.player.rect.x, self.player.rect.y) # Mengambil posisi player saat ini
         self.position_enemys = list(map(lambda enemy: (enemy.rect.x, enemy.rect.y), self.enemies)) # List yang menampung posisi dari semua enemy
         self.current_time = gp.pygame.time.get_ticks()
@@ -277,7 +331,7 @@ class Battle:
         self.explosions.draw(self.screen)
         self.bullet_explosions.draw(self.screen)
 
-
+    # Memperbarui setiap musuh dalam permainan.
     def enemy_update(self):
         """
         Memperbarui setiap musuh dalam permainan.
@@ -288,7 +342,7 @@ class Battle:
             elif enemy.enemy_type == "kamikaze":
                 enemy.update(self.position_player)
 
-
+    # Menghapus elemen objek yang sudah tidak terlihat pada layar.
     def remove_elemen_obj(self):
         """
         Menghapus elemen objek yang sudah tidak terlihat pada layar.
@@ -297,8 +351,11 @@ class Battle:
         - Menghapus serangan musuh yang melewati batas bawah layar.
         """
         # Memfilter dan hanya menyimpan serangan player yang masih berada di layar
-        for attacks_d in self.player.player_basic_attacks:
-            gp.pygame.sprite.Group([attack for attack in attacks_d if attack.rect.y > 0])
+        try:
+            for attacks_d in self.player.player_basic_attacks:
+                gp.pygame.sprite.Group([attack for attack in attacks_d if attack.rect.y > 0])
+        except Exception as e:
+            print(e)
 
         # Memfilter dan hanya menyimpan serangan musuh yang masih berada di layar
         for enemy in self.enemies:
@@ -309,7 +366,7 @@ class Battle:
             if (0 > enemy.rect.x > self.screen_width) or (0 > enemy.rect.y > self.screen_height):
                 enemy.kill()
 
-
+    # Mengecek dan membuat serangan dasar baik dari player maupun musuh.
     def cek_actor_attack(self):
         """
         Mengecek dan membuat serangan dasar baik dari player maupun musuh.
@@ -328,7 +385,7 @@ class Battle:
             # Membuat serangan player dengan parameter yang sesuai
             self.player.create_basic_attack_player(AttackActor, self.player,  self.player.last_BasicAttack_time)
             
-
+    # Membuat, menangani, dan menampilkan musuh-musuh dalam permainan.
     def create_enemy(self):
         """
         Membuat, menangani, dan menampilkan musuh-musuh dalam permainan.
@@ -349,25 +406,28 @@ class Battle:
                 enemy_attack = False
 
                 # Menangani serangan player terhadap musuh
-                for attacks in self.player.player_basic_attacks:
-                    for attack in attacks:
-                        if enemy.health <=  0:
-                            # Menangani ledakan dan menghapus musuh jika kesehatan habis
-                            if enemy in self.enemies: 
-                                for jml_explosions in range(gp.random.randint(1, 2)):
-                                    self.explosions.add(Explosion(x = enemy.rect.x+gp.random.randint(-50, 50), y = enemy.rect.y+gp.random.randint(-50, 50), explosion_images = self.image_explosion))
-                                self.player.score +=  1
-                                self.enemies.remove(enemy)
+                try:
+                    for attacks in self.player.player_basic_attacks:
+                        for attack in attacks:
+                            if enemy.health <=  0:
+                                # Menangani ledakan dan menghapus musuh jika kesehatan habis
+                                if enemy in self.enemies: 
+                                    for jml_explosions in range(gp.random.randint(1, 2)):
+                                        self.explosions.add(Explosion(x = enemy.rect.x+gp.random.randint(-50, 50), y = enemy.rect.y+gp.random.randint(-50, 50), explosion_images = self.image_explosion))
+                                    self.player.score +=  1
+                                    self.enemies.remove(enemy)
 
-                        # Menangani serangan player dan efek ledakan
-                        if attack.rect.colliderect(enemy.rect):
-                            enemy.health -=  self.player.damage
-                            if self.player.type_basicAttack == "type_2": 
-                                self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
-                                self.bullet_explosions.add(Explosion(x = attack.rect.x+10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
-                            elif self.player.type_basicAttack == "type_1":
-                                self.bullet_explosions.add(Explosion(x = attack.rect.x, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
-                            attacks.remove(attack)
+                            # Menangani serangan player dan efek ledakan
+                            if attack.rect.colliderect(enemy.rect):
+                                enemy.health -=  self.player.damage
+                                if self.player.type_basicAttack == "type_2": 
+                                    self.bullet_explosions.add(Explosion(x = attack.rect.x-10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
+                                    self.bullet_explosions.add(Explosion(x = attack.rect.x+10, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
+                                elif self.player.type_basicAttack == "type_1":
+                                    self.bullet_explosions.add(Explosion(x = attack.rect.x, y = attack.rect.y, explosion_images = self.bullet_explosions_image))
+                                attacks.remove(attack)
+                except Exception:
+                    print('error cek basic attack')
 
             for attack in enemy.enemy_basic_attacks:
                 if attack.rect.colliderect(self.player.rect):
@@ -386,20 +446,60 @@ class Battle:
             if 0 < enemy.rect.x > self.screen_width or enemy.rect.y > self.screen_height:
                 self.enemies.remove(enemy)
 
-
+# Kelas untuk merepresentasikan tingkat permainan.
 class Level:
+    """
+    Kelas untuk merepresentasikan tingkat permainan.
+
+    Args:
+    - screen_width (int): Lebar layar permainan.
+    - screen_height (int): Tinggi layar permainan.
+
+    Attributes:
+    - screen_width (int): Lebar layar permainan.
+    - screen_height (int): Tinggi layar permainan.
+
+    Methods:
+    - generate_lane (self, formula, num_points=150): Menghasilkan jalur berdasarkan formula matematika.
+    """
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
-        
+
+    # Menghasilkan jalur berdasarkan formula matematika.
     def generate_lane(self, formula, num_points=150):
-        x_values = gp.np.linspace(0, self.screen_width+1000, num_points)
+        """
+        Menghasilkan jalur berdasarkan formula matematika.
+
+        Args:
+        - formula (function): Fungsi matematika yang mengembalikan nilai y berdasarkan nilai x.
+        - num_points (int): Jumlah titik pada jalur.
+
+        Returns:
+        - list: List koordinat (x, y) pada jalur.
+        """
+        x_values = gp.np.linspace(0, self.screen_width + 1000, num_points)
         y_values = formula(x_values)
         lane = list(zip(x_values, y_values))
         return lane
 
-
+# Kelas untuk merepresentasikan Level 1 dalam permainan.
 class Level1(Battle, Level):
+    """
+        Kelas untuk merepresentasikan Level 1 dalam permainan.
+
+        Args:
+        - screen (Surface): Objek layar permainan.
+        - screen_height (int): Tinggi layar permainan.
+        - screen_width (int): Lebar layar permainan.
+
+        Attributes:
+        - stage (dict): Konfigurasi stage Level 1.
+
+        Methods:
+        - __init__ (self, screen, screen_height, screen_width): Inisialisasi objek Level 1.
+    """
+        
     def __init__(self, screen, screen_height, screen_width):
         Level.__init__(self, screen_width, screen_height)
         
@@ -452,8 +552,22 @@ class Level1(Battle, Level):
 
         super().__init__(screen, screen_height, screen_width, path_image_background, stage)
 
-
+# Kelas untuk merepresentasikan Level 2 dalam permainan.
 class Level2(Battle, Level):
+    """
+        Kelas untuk merepresentasikan Level 2 dalam permainan.
+
+        Args:
+        - screen (Surface): Objek layar permainan.
+        - screen_height (int): Tinggi layar permainan.
+        - screen_width (int): Lebar layar permainan.
+
+        Attributes:
+        - stage (dict): Konfigurasi stage Level 1.
+
+        Methods:
+        - __init__ (self, screen, screen_height, screen_width): Inisialisasi objek Level 1.
+        """
     def __init__(self, screen, screen_height, screen_width):
         Level.__init__(self, screen_width, screen_height)
         
@@ -598,8 +712,22 @@ class Level2(Battle, Level):
         y = gp.np.piecewise(x, [x <= 500, x > 500], [lambda x: 0, lambda x: gp.np.sin((x - 500) * gp.np.pi / 1000) * 500])
         return y
 
-
+# Kelas untuk merepresentasikan Level 3 dalam permainan.
 class Level3(Battle, Level):
+    """
+        Kelas untuk merepresentasikan Level 3 dalam permainan.
+
+        Args:
+        - screen (Surface): Objek layar permainan.
+        - screen_height (int): Tinggi layar permainan.
+        - screen_width (int): Lebar layar permainan.
+
+        Attributes:
+        - stage (dict): Konfigurasi stage Level 1.
+
+        Methods:
+        - __init__ (self, screen, screen_height, screen_width): Inisialisasi objek Level 1.
+        """
     def __init__(self, screen, screen_height, screen_width):
         Level.__init__(self, screen_width, screen_height)
         

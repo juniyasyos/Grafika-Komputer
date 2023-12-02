@@ -50,16 +50,38 @@ class Button(gp.pygame.sprite.Sprite):
 
 
 class Views:
-    def __init__(self, screen, screen_width, screen_height, window_size):
-        """
-        Inisialisasi tampilan Views.
+    """
+    Kelas untuk mengelola tampilan dalam permainan.
 
-        Parameters:
-        - screen: Objek layar Pygame.
-        - screen_width (int): Lebar layar.
-        - screen_height (int): Tinggi layar.
-        - window_size (tuple): Ukuran jendela tampilan.
-        """
+    Args:
+    - screen: Objek layar permainan.
+    - screen_width (int): Lebar layar permainan.
+    - screen_height (int): Tinggi layar permainan.
+    - window_size: Ukuran jendela permainan.
+
+    Attributes:
+    - screen: Objek layar permainan.
+    - screen_width (int): Lebar layar permainan.
+    - screen_height (int): Tinggi layar permainan.
+    - window_size: Ukuran jendela permainan.
+    - path: Path menuju direktori tampilan.
+    - battle: Objek tampilan pertempuran.
+    - background_battle: Gambar latar belakang tampilan pertempuran.
+    - buttons: Grup sprite tombol.
+    - background_home: Gambar latar belakang tampilan rumah.
+    - background_select_lvl: Gambar latar belakang tampilan pemilihan level.
+    - set_background: Gambar latar belakang yang diatur saat ini.
+    - background_page_player_lose: Gambar latar belakang tampilan pemain kalah.
+    - background_page_player_win: Gambar latar belakang tampilan pemain menang.
+    - start_time: Waktu mulai tampilan.
+    - start_time_index: Indeks waktu mulai.
+    - Level_now: Level saat ini.
+
+    Methods:
+    - __init__: Inisialisasi objek tampilan.
+    """
+    
+    def __init__(self, screen, screen_width, screen_height, window_size):
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -71,11 +93,12 @@ class Views:
         self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
         self.background_select_lvl = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
         self.set_background = self.background_home
-        self.background_page_player_lose = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
-        self.background_page_player_win = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
+        self.background_page_player_lose = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
+        self.background_page_player_win = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
 
         self.start_time = gp.pygame.time.get_ticks()
         self.start_time_index = 0
+        self.Level_now = None
         
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.sound_files = {
@@ -90,11 +113,9 @@ class Views:
         
         self.sound_files["home backsound"].play(maxtime=-1)
 
-
+    # Menambahkan tombol ke grup tombol
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
-        Menambahkan tombol ke grup tombol.
-
         Parameters:
         - image: Gambar tombol.
         - pos_x (int): Koordinat x posisi tombol.
@@ -105,10 +126,8 @@ class Views:
         button = Button(image, pos_x, pos_y, action, parameters)
         self.buttons.add(button)
 
+    # Menampilkan tampilan menu level.
     def views_menu_lvl(self):
-        """
-        Menampilkan tampilan menu level.
-        """
         data_buttons = {
             'btn_1':{
                 'image': load_image("../resources/assets/level select/button lvl 1.png"),
@@ -166,11 +185,9 @@ class Views:
                 button['pos_x'], button['pos_y'], 
                 action=button['action'], 
                 parameters=button['parameters'])
-        
+    
+    # Menampilkan tampilan Beranda.
     def Beranda(self):
-        """
-        Menampilkan tampilan Views.
-        """
         data_buttons = {
             'btn_start':{
                 'image':load_image("../resources/assets/Menu/start_button.png"),
@@ -200,44 +217,41 @@ class Views:
                 button['image'], 
                 button['pos_x'], button['pos_y'], 
                 action=button['action'], 
-                parameters=button['parameters'])
+                parameters=button['parameters'])  
     
-    
+    # Menampilkan tampilan page player win
     def page_player_win(self):
-        """
-        Menampilkan tampilan Views.
-        """
         data_buttons = {
             'btn_home':{
                 'image':load_image("../resources/assets/GAME OVER/HOME.png"),
-                'pos_x': self.screen_width // 4.2,
+                'pos_x': self.screen_width // 4.2 - 50,
                 'pos_y': self.screen_height // 1.9 - 160,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
-            },
-            'btn_next':{
-                'image': load_image("../resources/assets/GAME OVER/NEXT BTN.png"),
-                'pos_x': self.screen_width // 2.9,
-                'pos_y': self.screen_height // 1.7 - 70,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'action': [self.set_path],
+                'parameters': [["Views"]]
             },
             'btn_retry':{
                 'image': load_image("../resources/assets/GAME OVER/RETRYBTN.png"),
-                'pos_x': self.screen_width // 2.2,
+                'pos_x': self.screen_width // 2 + 270,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [self.Level_now, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_next':{
+                'image': load_image("../resources/assets/GAME OVER/NEXT BTN.png"),
+                'pos_x': self.screen_width // 2.4 + 15,
+                'pos_y': self.screen_height // 1.7 - 180,
+                'action': [self.next_level ,self.set_path, self.set_Level],
+                'parameters': [[None],["Battle"], [self.Level_now, [self.screen, self.screen_width, self.screen_height]]]
             }
         }
         for button in data_buttons.values():
             self.add_button(
-                button['image'], 
-                button['pos_x'], button['pos_y'], 
-                action=button['action'], 
+                button['image'],
+                button['pos_x'], button['pos_y'],
+                action=button['action'],
                 parameters=button['parameters'])
         
-    
+    # Menampilkan tampilan page player lose
     def page_player_lose(self):
         """
                 Menampilkan tampilan Views.
@@ -245,17 +259,17 @@ class Views:
         data_buttons = {
             'btn_home':{
                 'image':load_image("../resources/assets/GAME OVER/HOME.png"),
-                'pos_x': self.screen_width // 4.2,
+                'pos_x': self.screen_width // 4.2 - 20,
                 'pos_y': self.screen_height // 1.9 - 160,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Views/Stage"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'action': [self.set_path],
+                'parameters': [["Views"]]
             },
             'btn_retry':{
                 'image': load_image("../resources/assets/GAME OVER/RETRYBTN.png"),
-                'pos_x': self.screen_width // 2.2,
+                'pos_x': self.screen_width // 2.2 + 250,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Player Lose"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [self.Level_now, [self.screen, self.screen_width, self.screen_height]]]
             }
         }
         for button in data_buttons.values():
@@ -265,10 +279,9 @@ class Views:
                 action=button['action'], 
                 parameters=button['parameters']) 
     
+    # Merender tampilan berdasarkan ukuran layar yang diberikan.
     def rendering(self, height, width):
         """
-        Merender tampilan berdasarkan ukuran layar yang diberikan.
-
         Parameters:
         - height (int): Tinggi layar.
         - width (int): Lebar layar.
@@ -297,23 +310,20 @@ class Views:
             condition = self.battle.run(self.start_time_index == 0)
             self.start_time_index+=1
             if condition is True:
-                print("player win")
                 self.set_background = self.background_page_player_win
-                self.sound_files["battle sound"].stop()
-                self.sound_files["win sound"].play()
-                self.page_player_win()
                 self.path = "Player Win"
                 self.start_time_index = 0
             elif condition is False:
-                self.sound_files["battle sound"].stop()
-                self.sound_files["lose sound"].play()
-                self.page_player_lose()
-                print("player lose")
                 self.set_background = self.background_page_player_lose
                 self.path = "Player Lose"
                 self.start_time_index = 0
             else:
                 self.set_background = self.background_battle
+        elif self.path == "Player Win":
+            self.page_player_win()
+        elif self.path == "Player Lose":
+            self.page_player_lose()
+            
 
         # Memperbarui grup tombol
         self.buttons.update()
@@ -342,11 +352,11 @@ class Views:
         # Mengembalikan True agar permainan tetap berjalan
         return True
 
-
+    # Menetapkan gambar latar belakang.
     def func_set_background(self, file, window_size):
         """
         Menetapkan gambar latar belakang.
-
+        
         Parameters:
         - file (str): Nama file gambar latar belakang.
         - window_size (tuple): Ukuran jendela tampilan.
@@ -365,10 +375,9 @@ class Views:
             print(f"Failed to load image: {image_filename}")
             raise e
         
-
+    # Mengatur path berdasarkan input click user.
     def set_path(self, path, next_sound=True):
         """
-        Mengatur path berdasarkan input.
 
         Parameters:
         - path (str): Path baru.
@@ -379,18 +388,37 @@ class Views:
             
             if path == "Views":
                 self.sound_files["home backsound"].play(maxtime=-1)
-            elif path == "Battle":
-                self.sound_files["battle sound"].play(maxtime=-1)
         self.path = path
         
+    # Mengatur level berdasarkan input click dari user
     def set_Level(self, Level, parameters):
         """
-        Mengatur level berdasarkan input.
+        Mengatur level berdasarkan input click dari user
 
         Parameters:
         - Level: Kelas level.
         - parameters (list): Daftar parameter level.
         """
-        self.battle = Level(*parameters)
+        self.Level_now = Level
+        self.battle = self.Level_now(*parameters)
         # merubah background battle sesuai dengan level
         self.background_battle = self.func_set_background(self.battle.path_image_background, self.window_size)
+    
+    # Pindah ke level selanjutnya.
+    def next_level(self):
+        """
+        Pindah ke level selanjutnya.
+
+        Notes:
+        - Fungsi ini hanya mengubah level saat ini ke level selanjutnya.
+        """
+        if self.Level_now == Level1:
+            self.Level_now = Level2
+        elif self.Level_now == Level2:
+            self.Level_now = Level3
+        elif self.Level_now == Level3:
+            self.Level_now = Level4
+        elif self.Level_now == Level4:
+            self.Level_now = Level5
+        else:
+            self.path = "Beranda"

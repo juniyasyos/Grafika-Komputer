@@ -1,60 +1,61 @@
 from .. import gameplay as gp
 
 class Player:
-    """
-    Representasi objek player dalam permainan.
-
-    Parameters:
-    - screen_width (int): Lebar layar game.
-    - screen_height (int): Tinggi layar game.
-    - screen (Surface): Layar game.
-
-    Attributes:
-    - screen (Surface): Layar game.
-    - screen_width (int): Lebar layar game.
-    - screen_height (int): Tinggi layar game.
-    - image (Surface): Gambar player.
-    - image_rocket (Surface): Gambar roket.
-    - rect (Rect): Area persegi panjang yang mengelilingi gambar player.
-    - font (Font): Objek font untuk menampilkan teks.
-    - speed (int): Kecepatan pergerakan player.
-    - health (int): Kesehatan player.
-    - max_health (int): Kesehatan maksimum player.
-    - score (int): Skor player.
-    - damage (int): Jumlah kerusakan yang diakibatkan serangan player.
-    - last_BasicAttack_time (int): Waktu terakhir basic attack player.
-    - shield (int): Pelindung player.
-    - max_shield (int): Pelindung maksimum player.
-    - delay_basicAttack (int): Waktu jeda antar basic attack.
-    - regen_hp (float): Tingkat regenerasi kesehatan player.
-    - type_basicAttack (str): Jenis basic attack player ("type_1" atau "type_2").
-    - basic_attack_speed (int): Kecepatan basic attack player.
-    - player_basic_attacks_type1 (list): Daftar grup basic attack tipe 1.
-    - player_basic_attacks_type2 (list): Daftar grup basic attack tipe 2.
-    - available_basic_attacks (list): Daftar basic attack yang belum digunakan.
-    - basic_attack_path (Surface): Gambar jalur basic attack.
-    - skills (dict): Daftar skill player beserta informasi cooldown dan status aktif.
-    - current_time (int): Waktu sekarang dalam permainan.
-
-    Methods:
-    - update(self): Memperbarui status player.
-    - handle_events(self): Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
-    - skill_use(self): Menggunakan dan memproses efek skill player.
-    - take_damage(self, damage=10): Mengurangi kesehatan atau pelindung player berdasarkan jumlah kerusakan.
-    - draw_health_bar(self): Menampilkan indikator kesehatan dan pelindung player di layar.
-    - draw_score(self): Menampilkan skor player di layar.
-    - create_basic_attack_player(self, BasicAttack, player, last_time): Membuat basic attack player.
-    - draw_icon_skill(self): Menampilkan ikon dan cooldown skill di layar.
-    - set_basicAttack_func(self): Menetapkan fungsi untuk menampilkan basic attack player di layar.
-    """
     def __init__(self, screen_width, screen_height, screen):
         """
-        Inisialisasi objek player.
+            Kelas untuk merepresentasikan pemain dalam permainan.
 
-        Parameters:
-        - screen_width (int): Lebar layar game.
-        - screen_height (int): Tinggi layar game.
-        - screen (Surface): Layar game.
+            Args:
+            - screen_width (int): Lebar layar permainan.
+            - screen_height (int): Tinggi layar permainan.
+            - screen: Objek layar permainan.
+
+            Attributes:
+            - screen: Objek layar permainan.
+            - screen_width (int): Lebar layar permainan.
+            - screen_height (int): Tinggi layar permainan.
+            - image: Gambar pemain.
+            - image_rocket: Gambar roket pemain.
+            - rect: Rect objek gambar pemain.
+            - font: Font teks untuk tampilan skor dan informasi skill.
+            - speed (int): Kecepatan pemain.
+            - health (int): Kesehatan pemain.
+            - max_health (int): Kesehatan maksimum pemain.
+            - score (int): Skor pemain.
+            - damage (int): Besar serangan pemain.
+            - last_BasicAttack_time (int): Waktu terakhir serangan dasar dilakukan.
+            - last_RocketAttack_time (int): Waktu terakhir serangan roket dilakukan.
+            - shield (int): Perisai pemain.
+            - max_shield (int): Perisai maksimum pemain.
+            - delay_basicAttack (int): Waktu jeda serangan dasar.
+            - delay_rocketAttack (int): Waktu jeda serangan roket.
+            - regen_hp (float): Tingkat regenerasi kesehatan pemain.
+            - type_basicAttack (str): Tipe serangan dasar pemain.
+            - basic_attack_speed (int): Kecepatan serangan dasar.
+            - player_rocket_attacks: Grup sprite serangan roket.
+            - player_basic_attacks_type1: List grup sprite serangan dasar tipe 1.
+            - player_basic_attacks_type2: List grup sprite serangan dasar tipe 2.
+            - available_basic_attacks: Daftar serangan dasar yang tersedia.
+            - player_win (bool): Status kemenangan pemain.
+            - handle_option (bool): Status penanganan opsi.
+            - basic_attack_path: Gambar jalur serangan dasar.
+            - rocket_attack_path: Gambar jalur serangan roket.
+            - basic_attack_sound: Suara serangan dasar.
+            - skills (dict): Keterampilan pemain.
+            
+             Methods:
+            - __init__: Inisialisasi objek pemain.
+            - update:  Memperbarui status player.
+            - handle_events (option=False): Menangani input pengguna untuk menggerakkan player dan menggunakan skill.
+            - skill_use : Menggunakan dan memproses efek skill player.
+            - take_damage(damage=10) : Mengurangi kesehatan atau pelindung player berdasarkan jumlah kerusakan.
+            - draw_health_bar: Menampilkan indikator kesehatan dan pelindung player di layar
+            - draw_score: Menampilkan skor player di layar.
+            - create_basic_attack_player (AttackActor, player, last_time): Membuat basic attack player.
+            - create_rocket_attack_player (AttackActor, player, enemy_posisition): Membuat serangan roket player.
+            - draw_icon_skill: Menampilkan ikon dan cooldown skill di layar.
+            - set_basicAttack_func: Menetapkan fungsi untuk menampilkan basic attack player di layar.
+    
         """
         self.screen = screen
         self.screen_width = screen_width
@@ -99,7 +100,7 @@ class Player:
         # Player skills
         self.skills = {
             "1": {"masif_att": {"active": False, "cooldown": 9000, "duration": 5000, "last_used": 0, "used": 0}},
-            "2": {"double_att": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
+            "2": {"doub_att": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
             "3": {"rocket": {"active": False, "cooldown": 30000, "duration": 5000, "last_used": 0, "used": 0}},
             "4": {"shield": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
             "SPACE": {"regen": {"active": False, "cooldown": 30000, "duration": 2000, "last_used": 0, "used": 0}}
@@ -166,6 +167,8 @@ class Player:
                 # Memproses skill "masif_att"
                 if skill_name == "masif_att":
                     self.damage = 30 if skill_info["active"] else 25
+                    self.basic_attack_speed = 20 if skill_info["active"] else 15
+                    self.basic_attack_path = gp.load_image("../resources/assets/Battle/Laser Sprites/11.png", scale=5) if skill_info["active"] else gp.load_image("../resources/assets/Battle/Laser Sprites/11.png", scale=3)
                 
                 # Memproses skill "regen" untuk pemulihan kesehatan
                 if skill_name == "regen" and not self.health > self.max_health:
@@ -183,8 +186,8 @@ class Player:
                 if skill_name == "rocket":
                     pass
                 
-                # Memproses skill "double_att" untuk pengaturan basic attack
-                if skill_name == "double_att":
+                # Memproses skill "doub_att" untuk pengaturan basic attack
+                if skill_name == "doub_att":
                     self.type_basicAttack = "type_2" if skill_info["active"] else "type_1"
                     self.delay_basicAttack = 120 if skill_info["active"] else 180
                     self.damage += 10 if skill_info["active"] else 25
@@ -209,7 +212,7 @@ class Player:
             self.health -= damage
             self.health = max(self.health, 0)
 
-    # Menampilkan indikator kesehatan dan pelindung player di layar.
+    # Menampilkan indikator kesehatan dan pelindung player di layar
     def draw_health_bar(self):
         """Menampilkan indikator kesehatan dan pelindung player di layar."""
         
