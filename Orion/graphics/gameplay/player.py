@@ -71,11 +71,11 @@ class Player:
         self.rect.bottom = screen_height - 10
 
         # Player attributes
-        self.speed = 0
-        self.health = 100
-        self.max_health = 100
+        self.speed = 10
+        self.health = 500
+        self.max_health = 500
         self.score = 0
-        self.damage = 10
+        self.damage = 24
         self.last_BasicAttack_time = 0
         self.last_RocketAttack_time = 0
         self.shield = 50
@@ -98,8 +98,8 @@ class Player:
 
         # Player skills
         self.skills = {
-            "1": {"speed": {"active": False, "cooldown": 9000, "duration": 5000, "last_used": 0, "used": 0}},
-            "2": {"masif_ba": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
+            "1": {"masif_att": {"active": False, "cooldown": 9000, "duration": 5000, "last_used": 0, "used": 0}},
+            "2": {"double_att": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
             "3": {"rocket": {"active": False, "cooldown": 30000, "duration": 5000, "last_used": 0, "used": 0}},
             "4": {"shield": {"active": False, "cooldown": 20000, "duration": 10000, "last_used": 0, "used": 0}},
             "SPACE": {"regen": {"active": False, "cooldown": 30000, "duration": 2000, "last_used": 0, "used": 0}}
@@ -163,9 +163,9 @@ class Player:
         for skill_key, skill_data in self.skills.items():
             for skill_name, skill_info in skill_data.items():
                 
-                # Memproses skill "speed"
-                if skill_name == "speed":
-                    self.speed = 20 if skill_info["active"] else 10
+                # Memproses skill "masif_att"
+                if skill_name == "masif_att":
+                    self.damage = 30 if skill_info["active"] else 25
                 
                 # Memproses skill "regen" untuk pemulihan kesehatan
                 if skill_name == "regen" and not self.health > self.max_health:
@@ -183,11 +183,11 @@ class Player:
                 if skill_name == "rocket":
                     pass
                 
-                # Memproses skill "masif_ba" untuk pengaturan basic attack
-                if skill_name == "masif_ba":
+                # Memproses skill "double_att" untuk pengaturan basic attack
+                if skill_name == "double_att":
                     self.type_basicAttack = "type_2" if skill_info["active"] else "type_1"
                     self.delay_basicAttack = 120 if skill_info["active"] else 180
-                    self.damage = 24 if skill_info["active"] else 28
+                    self.damage += 10 if skill_info["active"] else 25
                     self.player_basic_attacks = self.player_basic_attacks_type2 if skill_info["active"] else self.player_basic_attacks_type1
                     self.available_basic_attacks = self.player_basic_attacks_type1 if skill_info["active"] else self.player_basic_attacks_type2
                     

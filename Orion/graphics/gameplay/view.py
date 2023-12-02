@@ -80,6 +80,7 @@ class Views:
             "button click": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/button click.mp3")),
             "home backsound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/home backsound.mp3")),
             "win sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
+            "lose sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/lose sound.mp3")),
             "battle sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/battle sound .mp3")),
         }
         
@@ -238,9 +239,13 @@ class Views:
             condition = self.battle.run()
             if condition is True:
                 print("player win")
+                self.sound_files["battle sound"].stop()
+                self.sound_files["win sound"].play()
                 self.page_player_win()
                 self.path = "Player Win"
             elif condition is False:
+                self.sound_files["battle sound"].stop()
+                self.sound_files["lose sound"].play()
                 self.page_player_lose()
                 print("player lose")
                 self.path = "Player Lose"
