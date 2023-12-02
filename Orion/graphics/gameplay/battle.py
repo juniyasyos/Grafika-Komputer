@@ -168,6 +168,15 @@ class Battle:
         self.path_image_background = image_background   
         self.kill_player_delay = 0 
         self.stage = stage
+        current_directory = gp.os.path.dirname(gp.os.path.abspath(__file__))
+        self.sound_files = {
+            "win sound": gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
+            "lose sound": gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/lose sound.mp3")),
+            "battle sound" : gp.pygame.mixer.Sound(gp.os.path.join(current_directory,"../resources/assets/Sound/battle sound .mp3"))
+        }
+        
+        for sound in self.sound_files.values():
+            sound.set_volume(0.3)
         
         # Membuat objek Player dan elemennya
         self.player = Player(self.screen_width, self.screen_height, screen = self.screen)
@@ -187,7 +196,7 @@ class Battle:
             gp.pygame.time.delay(4000 // (256 // 6))
 
     
-    def run(self):
+    def run(self, play_sound):
         """
         Menjalankan level.
         
@@ -195,7 +204,10 @@ class Battle:
         - Jika sudah, memeriksa apakah masih ada stage berikutnya untuk dijalankan.
         - Jika iya, menyiapkan dan memulai stage berikutnya.
         """
-
+        if play_sound:
+            self.sound_files["battle sound"].play(maxtime=-1)
+            self.play_sound = False
+        
         # Memeriksa apakah musuh dalam layar sudah habis
         if len(self.enemies) == 0:
             # Memeriksa apakah masih ada stage berikutnya untuk dijalankan
@@ -222,10 +234,14 @@ class Battle:
         if self.player.health <= 0:
             current_time = gp.pygame.time.get_ticks()
             finish_delay = 7000
+            self.sound_files["battle sound"].stop()
+            self.sound_files["lose sound"].play()
              
             if current_time - self.kill_player_delay >= finish_delay:
                 return False
-            elif current_time - self.kill_player_delay >= 2500:
+            elif current_time - self.kill_player_delay >= 2500:    
+                self.sound_files["battle sound"].stop()
+                self.sound_files["win sound"].play(maxtime=1)
                 self.fade_animation()
             else:
                 self.player.handle_option = False
