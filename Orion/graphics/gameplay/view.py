@@ -74,7 +74,6 @@ class Views:
         self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
         self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
 
-        
         self.start_time = gp.pygame.time.get_ticks()
         self.start_time_index = 0
         
@@ -90,6 +89,7 @@ class Views:
             sound.set_volume(0.3)
         
         self.sound_files["home backsound"].play(maxtime=-1)
+
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
@@ -298,11 +298,14 @@ class Views:
             self.start_time_index+=1
             if condition is True:
                 print("player win")
+                self.sound_files["battle sound"].stop()
                 self.sound_files["win sound"].play()
+
                 self.page_player_win()
                 self.path = "Player Win"
                 self.start_time_index = 0
             elif condition is False:
+                self.sound_files["battle sound"].stop()
                 self.sound_files["lose sound"].play()
                 self.page_player_lose()
                 print("player lose")
@@ -369,14 +372,14 @@ class Views:
         Parameters:
         - path (str): Path baru.
         """
-        
         if next_sound is True:
             for sound in self.sound_files.values():
                 sound.stop()
             
             if path == "Views":
                 self.sound_files["home backsound"].play(maxtime=-1)
-        
+            elif path == "Battle":
+                self.sound_files["battle sound"].play(maxtime=-1)
         self.path = path
         
     def set_Level(self, Level, parameters):

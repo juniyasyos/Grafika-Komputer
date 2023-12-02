@@ -9,6 +9,7 @@ os.environ['SDL_VIDEO-CENTERED'] = '1'
 class Game:
     def __init__(self) -> None:
         pygame.init()
+        pygame.mixer.init()
         WINDOW_INFO_SIZE = pygame.display.Info()
 
         #elemen jendela

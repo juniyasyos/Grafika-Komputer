@@ -104,7 +104,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 distance = dx * dx + dy * dy
 
                 # Menetapkan toleransi kuadrat untuk menentukan apakah musuh sudah mencapai titik tujuan
-                tolerance_squared = 35
+                tolerance_squared = 15
                 
                 # Memeriksa apakah musuh sudah mencapai titik tujuan
                 if distance < tolerance_squared:
@@ -195,7 +195,7 @@ class EnemyType1(obj_Enemy):
     - update(self):
         Memperbarui status musuh tipe 1.
     """
-    def __init__(self, screen, path, delay, x = 0, y = 0, speed = 5):
+    def __init__(self, screen, path, delay, x = None, y = None, speed = 5, size=40, health=300):
         """
         Inisialisasi objek musuh tipe 1.
 
@@ -206,14 +206,16 @@ class EnemyType1(obj_Enemy):
         - x (int): Koordinat x awal musuh.
         - y (int): Koordinat y awal musuh.
         """
-        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (40,40), rotation = 180, colorkey = (255,255,255))
+        image = gp.load_image("../resources/assets/Battle/NPC.png",size = (size,size), rotation = 180, colorkey = (255,255,255))
+        
         self.enemy_type = "normal"
         super().__init__(image, screen, path, delay, x=x, y=y)
         self.enemy_basic_attacks = pygame.sprite.Group()
-        self.health = 300
-        self.max_health = 300
+        self.health = health
+        self.max_health = health
         self.basic_attack_speed = 5
         self.speed = speed
+        
 
     def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack, count_all_enemy):
         """
@@ -270,7 +272,7 @@ class EnemyType1(obj_Enemy):
 
 
 class EnemyType2(obj_Enemy):
-    def __init__(self, screen, path, delay, x = 0, y = 0, speed = 5):
+    def __init__(self, screen, path, delay,x = None, y = None, speed = 6, size=40, health=100, damage=100):
         """
         Inisialisasi objek musuh tipe 2.
 
@@ -285,9 +287,10 @@ class EnemyType2(obj_Enemy):
         self.enemy_type = "kamikaze"
         super().__init__(image, screen, path, delay, x=x, y=y)
         self.enemy_basic_attacks = pygame.sprite.Group()
-        self.health = 100
-        self.max_health = 100
-        self.speed = 10
+        self.health = health
+        self.max_health = health
+        self.speed = speed
+        self.damage = damage
         
 
     def kamikaze(self, pos_player):
@@ -298,18 +301,23 @@ class EnemyType2(obj_Enemy):
         - pos_player (tuple): Koordinat pemain (x, y).
         """
         target_x, target_y = pos_player
+        target_x += 25
+        target_y += 25
         if (target_x, target_y) != (self.rect.x, self.rect.y):
-            dx = target_x - self.rect.x
-            dy = target_y - self.rect.y
+            try:
+                dx = target_x - self.rect.x
+                dy = target_y - self.rect.y
 
-            # Normalisasi vektor
-            magnitude = (dx ** 2 + dy ** 2) ** 0.5
-            normalized_dx = dx / magnitude
-            normalized_dy = dy / magnitude
+                # Normalisasi vektor
+                magnitude = (dx ** 2 + dy ** 2) ** 0.5
+                normalized_dx = dx / magnitude
+                normalized_dy = dy / magnitude
 
-            # Perbarui posisi berdasarkan kecepatan
-            self.rect.x += int(self.speed * normalized_dx)
-            self.rect.y += int(self.speed * normalized_dy)
+                # Perbarui posisi berdasarkan kecepatan
+                self.rect.x += int(self.speed * normalized_dx)
+                self.rect.y += int(self.speed * normalized_dy)
+            except Exception:
+                self.kill()
         else:
             self.kill()
 
