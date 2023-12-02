@@ -72,8 +72,8 @@ class Player:
 
         # Player attributes
         self.speed = 10
-        self.health = 500
-        self.max_health = 500
+        self.health = 200
+        self.max_health = 200
         self.score = 0
         self.damage = 24
         self.last_BasicAttack_time = 0
