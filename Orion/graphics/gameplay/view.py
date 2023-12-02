@@ -1,10 +1,10 @@
 from .. import gameplay as gp
 import sys
 import os
-from .battle import Level1, Level2
+from .battle import Level1, Level2, Level3
 
 def load_image(image_filename):
-    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
+    current_directory = os.path.dirname(os.path.abspath(_file_))  # Mengambil direktori saat ini
     image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
 
     try:
@@ -17,7 +17,7 @@ def load_image(image_filename):
         raise e
 
 class Button(gp.pygame.sprite.Sprite):
-    def __init__(self, image, pos_x, pos_y, action, parameters=[]):
+    def _init_(self, image, pos_x, pos_y, action, parameters=[]):
         """
         Inisialisasi objek tombol.
 
@@ -28,7 +28,7 @@ class Button(gp.pygame.sprite.Sprite):
         - action (list): Daftar fungsi aksi yang akan dijalankan saat tombol diklik.
         - parameters (list): Daftar parameter yang akan diteruskan ke fungsi aksi (opsional).
         """
-        super().__init__()
+        super()._init_()
         self.image = image
         self.rect = self.image.get_rect(topleft=(pos_x, pos_y))
         self.action = action
@@ -50,7 +50,7 @@ class Button(gp.pygame.sprite.Sprite):
 
 
 class Views:
-    def __init__(self, screen, screen_width, screen_height, window_size):
+    def _init_(self, screen, screen_width, screen_height, window_size):
         """
         Inisialisasi tampilan Views.
 
@@ -71,6 +71,25 @@ class Views:
         self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
         self.background_select_lvl = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
         self.set_background = self.background_home
+        self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
+        self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
+
+        
+        self.start_time = gp.pygame.time.get_ticks()
+        self.start_time_index = 0
+        
+        current_directory = os.path.dirname(os.path.abspath(_file_))
+        self.sound_files = {
+            "button click": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/button click.mp3")),
+            "home backsound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/home backsound.mp3")),
+            "win sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/win sound.mp3")),
+            "lose sound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/lose sound.mp3")),
+        }
+        
+        for sound in self.sound_files.values():
+            sound.set_volume(0.3)
+        
+        self.sound_files["home backsound"].play(maxtime=-1)
 
     def add_button(self, image, pos_x, pos_y, action=None, parameters=[]):
         """
@@ -110,21 +129,21 @@ class Views:
                 'pos_x': self.screen_width // 2.2,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_4':{
                 'image': load_image("../resources/assets/level select/button lvl 3.png"),
                 'pos_x': self.screen_width // 1.5,
                 'pos_y': self.screen_height // 1.9 - 160,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level3, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_5':{
                 'image': load_image("../resources/assets/level select/level lock button.png"),
                 'pos_x': self.screen_width // 1.8,
                 'pos_y': self.screen_height // 1.7 - 70,
                 'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_play':{
                 'image': load_image("../resources/assets/level select/button play.png"),
@@ -138,7 +157,7 @@ class Views:
                 'pos_x': self.screen_width // 6 + 60,
                 'pos_y': self.screen_height // 1.2 - 70,
                 'action': [self.set_path],
-                'parameters': [["Views"]]
+                'parameters': [["Views",False]]
             }
         }
         for button in data_buttons.values():
@@ -158,7 +177,7 @@ class Views:
                 'pos_x': self.screen_width // 3 + 84,
                 'pos_y': self.screen_height // 2 - 150,
                 'action' : [self.set_path, self.set_Level],
-                'parameters': [["Views/Stage"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'parameters': [["Views/Stage",False], [Level1, [self.screen, self.screen_width, self.screen_height]]]
             },
             'btn_inventory':{
                 'image':load_image("../resources/assets/Menu/inventory_button.png"),
@@ -185,10 +204,66 @@ class Views:
     
     
     def page_player_win(self):
-        pass
+        """
+        Menampilkan tampilan Views.
+        """
+        data_buttons = {
+            'btn_home':{
+                'image':load_image("../resources/assets/GAME OVER/HOME.png"),
+                'pos_x': self.screen_width // 4.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_next':{
+                'image': load_image("../resources/assets/GAME OVER/NEXT BTN.png"),
+                'pos_x': self.screen_width // 2.9,
+                'pos_y': self.screen_height // 1.7 - 70,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_retry':{
+                'image': load_image("../resources/assets/GAME OVER/RETRYBTN.png"),
+                'pos_x': self.screen_width // 2.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            }
+        }
+        for button in data_buttons.values():
+            self.add_button(
+                button['image'], 
+                button['pos_x'], button['pos_y'], 
+                action=button['action'], 
+                parameters=button['parameters'])
+        
     
     def page_player_lose(self):
-        pass
+        """
+                Menampilkan tampilan Views.
+        """
+        data_buttons = {
+            'btn_home':{
+                'image':load_image("../resources/assets/GAME OVER/HOME.png"),
+                'pos_x': self.screen_width // 4.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Views/Stage"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            },
+            'btn_retry':{
+                'image': load_image("../resources/assets/GAME OVER/RETRYBTN.png"),
+                'pos_x': self.screen_width // 2.2,
+                'pos_y': self.screen_height // 1.9 - 160,
+                'action': [self.set_path, self.set_Level],
+                'parameters': [["Player Lose"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+            }
+        }
+        for button in data_buttons.values():
+            self.add_button(
+                button['image'], 
+                button['pos_x'], button['pos_y'], 
+                action=button['action'], 
+                parameters=button['parameters']) 
     
     def rendering(self, height, width):
         """
@@ -219,20 +294,22 @@ class Views:
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
-            condition = self.battle.run()
+            condition = self.battle.run(self.start_time_index == 0)
+            self.start_time_index+=1
             if condition is True:
                 print("player win")
+                self.sound_files["win sound"].play()
                 self.page_player_win()
                 self.path = "Player Win"
+                self.start_time_index = 0
             elif condition is False:
+                self.sound_files["lose sound"].play()
                 self.page_player_lose()
                 print("player lose")
                 self.path = "Player Lose"
+                self.start_time_index = 0
             else:
-                print("player bertarung")
                 self.set_background = self.background_battle
-        else:
-            self.Beranda()
 
         # Memperbarui grup tombol
         self.buttons.update()
@@ -243,6 +320,7 @@ class Views:
                 gp.pygame.draw.rect(self.screen, 'cyan', (button.rect.x-3, button.rect.y+5, button.rect.width, button.rect.height+5), border_radius=10)
                 self.screen.blit(button.image,[(button.rect.x, button.rect.y+6), (button.rect.width, button.rect.height)])
                 if gp.pygame.mouse.get_pressed()[0] == 1:
+                    self.sound_files["button click"].play()
                     button.handle_click()
             else:
                 self.screen.blit(button.image, button.rect.topleft)
@@ -272,7 +350,7 @@ class Views:
         Returns:
         - pygame.Surface: Gambar latar belakang yang sudah diubah ukurannya sesuai dengan window_size.
         """
-        current_directory = os.path.dirname(os.path.abspath(__file__)) 
+        current_directory = os.path.dirname(os.path.abspath(_file_)) 
         image_path = os.path.join(current_directory, file) 
     
         try:
@@ -284,13 +362,21 @@ class Views:
             raise e
         
 
-    def set_path(self, path):
+    def set_path(self, path, next_sound=True):
         """
         Mengatur path berdasarkan input.
 
         Parameters:
         - path (str): Path baru.
         """
+        
+        if next_sound is True:
+            for sound in self.sound_files.values():
+                sound.stop()
+            
+            if path == "Views":
+                self.sound_files["home backsound"].play(maxtime=-1)
+        
         self.path = path
         
     def set_Level(self, Level, parameters):
