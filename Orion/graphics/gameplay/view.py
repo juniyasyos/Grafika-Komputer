@@ -4,7 +4,7 @@ import os
 from .battle import Level1, Level2, Level3
 
 def load_image(image_filename):
-    current_directory = os.path.dirname(os.path.abspath(_file_))  # Mengambil direktori saat ini
+    current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
     image_path = os.path.join(current_directory, image_filename)  # Membuat jalur lengkap ke file gambar
 
     try:
@@ -17,7 +17,7 @@ def load_image(image_filename):
         raise e
 
 class Button(gp.pygame.sprite.Sprite):
-    def _init_(self, image, pos_x, pos_y, action, parameters=[]):
+    def __init__(self, image, pos_x, pos_y, action, parameters=[]):
         """
         Inisialisasi objek tombol.
 
@@ -28,7 +28,7 @@ class Button(gp.pygame.sprite.Sprite):
         - action (list): Daftar fungsi aksi yang akan dijalankan saat tombol diklik.
         - parameters (list): Daftar parameter yang akan diteruskan ke fungsi aksi (opsional).
         """
-        super()._init_()
+        super().__init__()
         self.image = image
         self.rect = self.image.get_rect(topleft=(pos_x, pos_y))
         self.action = action
@@ -50,7 +50,7 @@ class Button(gp.pygame.sprite.Sprite):
 
 
 class Views:
-    def _init_(self, screen, screen_width, screen_height, window_size):
+    def __init__(self, screen, screen_width, screen_height, window_size):
         """
         Inisialisasi tampilan Views.
 
@@ -71,13 +71,13 @@ class Views:
         self.background_home = self.func_set_background("../resources/assets/Menu/home.png", self.window_size)
         self.background_select_lvl = self.func_set_background("../resources/assets/level select/level select.png", self.window_size)
         self.set_background = self.background_home
-        self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
-        self.background_select_lvl = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
+        self.background_page_player_lose = self.func_set_background("../resources/assets/GAME OVER/WIN POLOSAN.png", self.window_size)
+        self.background_page_player_win = self.func_set_background("../resources/assets/GAME OVER/LOSE POLOSAN.png", self.window_size)
 
         self.start_time = gp.pygame.time.get_ticks()
         self.start_time_index = 0
         
-        current_directory = os.path.dirname(os.path.abspath(_file_))
+        current_directory = os.path.dirname(os.path.abspath(__file__))
         self.sound_files = {
             "button click": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/button click.mp3")),
             "home backsound": gp.pygame.mixer.Sound(os.path.join(current_directory,"../resources/assets/Sound/home backsound.mp3")),
@@ -298,9 +298,9 @@ class Views:
             self.start_time_index+=1
             if condition is True:
                 print("player win")
+                self.set_background = self.background_page_player_win
                 self.sound_files["battle sound"].stop()
                 self.sound_files["win sound"].play()
-
                 self.page_player_win()
                 self.path = "Player Win"
                 self.start_time_index = 0
@@ -309,6 +309,7 @@ class Views:
                 self.sound_files["lose sound"].play()
                 self.page_player_lose()
                 print("player lose")
+                self.set_background = self.background_page_player_lose
                 self.path = "Player Lose"
                 self.start_time_index = 0
             else:
@@ -353,7 +354,7 @@ class Views:
         Returns:
         - pygame.Surface: Gambar latar belakang yang sudah diubah ukurannya sesuai dengan window_size.
         """
-        current_directory = os.path.dirname(os.path.abspath(_file_)) 
+        current_directory = os.path.dirname(os.path.abspath(__file__)) 
         image_path = os.path.join(current_directory, file) 
     
         try:
