@@ -80,7 +80,6 @@ class obj_Enemy(pygame.sprite.Sprite):
         self.basic_attack_speed = 10
         self.basic_attack_image = gp.load_image(image_filename = "../resources/assets/Battle/Laser Sprites/02.png", rotation = 180, colorkey = (255,255,255),size = (16,24), scale = 4)
         self.set_update_enemy = []
-        self.angle = 0
 
     def draw(self, screen):
         """Menampilkan gambar musuh di layar."""
@@ -110,6 +109,7 @@ class obj_Enemy(pygame.sprite.Sprite):
                 if distance < tolerance_squared:
                     # Memeriksa apakah sudah waktunya untuk berpindah ke titik jalur gerak berikutnya
                     if pygame.time.get_ticks() - self.delay_start_time > self.delay_to_next_path[self.path_index]:
+                        # self.set_angle(target_x, target_y)
                         self.path_index +=  1
                         self.delay_start_time = pygame.time.get_ticks()
                 else:
@@ -195,7 +195,7 @@ class EnemyType1(obj_Enemy):
     - update(self):
         Memperbarui status musuh tipe 1.
     """
-    def __init__(self, screen, path, delay, x = None, y = None, speed = 5, size=40, health=300):
+    def __init__(self, screen, path, delay, x = None, y = None, speed = 5, size=40, health=300, damage=None):
         """
         Inisialisasi objek musuh tipe 1.
 
@@ -215,6 +215,8 @@ class EnemyType1(obj_Enemy):
         self.max_health = health
         self.basic_attack_speed = 5
         self.speed = speed
+        if damage != None:
+            self.damage = damage
         
 
     def create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack, count_all_enemy):
@@ -301,17 +303,16 @@ class EnemyType2(obj_Enemy):
         - pos_player (tuple): Koordinat pemain (x, y).
         """
         target_x, target_y = pos_player
-        target_x += 25
-        target_y += 25
         if (target_x, target_y) != (self.rect.x, self.rect.y):
             try:
-                dx = target_x - self.rect.x
-                dy = target_y - self.rect.y
+                dx = target_x - self.rect.centerx
+                dy = target_y - self.rect.centery
 
                 # Normalisasi vektor
                 magnitude = (dx ** 2 + dy ** 2) ** 0.5
                 normalized_dx = dx / magnitude
                 normalized_dy = dy / magnitude
+                
 
                 # Perbarui posisi berdasarkan kecepatan
                 self.rect.x += int(self.speed * normalized_dx)
