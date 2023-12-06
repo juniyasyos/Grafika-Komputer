@@ -4,7 +4,8 @@ import os
 import random
 import math
 from .. import gameplay as gp
-        
+
+# class global enemy 
 class obj_Enemy(pygame.sprite.Sprite):
     """
     Representasi objek musuh dalam permainan.
@@ -168,8 +169,7 @@ class obj_Enemy(pygame.sprite.Sprite):
         # Menampilkan indikator kesehatan aktual (warna hijau)
         pygame.draw.rect(self.screen, (0, 255, 0), (self.rect.x, self.rect.y + 90, current_health_width, 5))
 
-    
-
+# class type enemy normal
 class EnemyType1(obj_Enemy):
     """
     Representasi objek musuh tipe 1 dalam permainan.
@@ -271,8 +271,7 @@ class EnemyType1(obj_Enemy):
         # Memperbarui pergerakan musuh sesuai jalur gerak
         self.update_basic()
     
-
-
+# class type enemy kamikaze
 class EnemyType2(obj_Enemy):
     def __init__(self, screen, path, delay,x = None, y = None, speed = 6, size=40, health=100, damage=100):
         """

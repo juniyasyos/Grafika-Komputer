@@ -967,3 +967,10 @@ class Level3(Battle, Level):
         y = gp.np.piecewise(x, [x <= 500, x > 500], [lambda x: 0, lambda x: gp.np.sin((x - 500) * gp.np.pi / 1000) * 500])
         return y
 
+# Kelas untuk merepresentasian Level 4 dalam permainan (melawan bos stage 1)
+class Level4(Battle, Level):
+    pass
+
+# Kelas untuk merepresentasian Level 5 dalam permainan (melawan bos stage 2)
+class Level5(Battle, Level):
+    pass
