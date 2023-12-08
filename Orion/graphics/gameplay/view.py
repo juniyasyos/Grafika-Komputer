@@ -422,3 +422,6 @@ class Views:
             self.Level_now = Level5
         else:
             self.path = "Beranda"
+            
+        for sound in self.sound_files.values():
+            sound.stop()
