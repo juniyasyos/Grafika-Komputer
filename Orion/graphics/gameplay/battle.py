@@ -198,7 +198,6 @@ class Battle:
             sound.set_volume(0.3)
         
     
-    
     # Animasi perubahan transparansi layar menjadi hitam.
     def fade_animation(self):
         """
