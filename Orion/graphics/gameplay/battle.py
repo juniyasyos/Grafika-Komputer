@@ -269,6 +269,7 @@ class Battle:
                 return False
             elif current_time - self.kill_player_delay >= 2500:
                 self.sound_files["battle sound"].stop()
+                
                 if self.start == 0:
                     self.start += 1
                     self.sound_files["win sound"].play(maxtime=1)
@@ -519,32 +520,32 @@ class Level1(Battle, Level):
             "Stage 1": [
                 EnemyType1(screen = screen, path = [(901, 0), (901, 50), (screen_width, 100)], delay = [1800, 20000, 500]),
                 EnemyType1(screen = screen, path = [(800, 0), (800, 100), (screen_width, 150)], delay = [1700, 20000, 1000]),
-                # EnemyType1(screen = screen, path = [(700, 0), (700, 150), (screen_width, 200)], delay = [1600, 20000, 1500]), 
-                # EnemyType1(screen = screen, path = [(600, 0), (600, 100), (screen_width, 250)], delay = [1700, 20000, 1000]),
-                # EnemyType1(screen = screen, path = [(501, 0), (501, 50), (screen_width, 300)], delay = [1800, 20000, 500]),
+                EnemyType1(screen = screen, path = [(700, 0), (700, 150), (screen_width, 200)], delay = [1600, 20000, 1500]), 
+                EnemyType1(screen = screen, path = [(600, 0), (600, 100), (screen_width, 250)], delay = [1700, 20000, 1000]),
+                EnemyType1(screen = screen, path = [(501, 0), (501, 50), (screen_width, 300)], delay = [1800, 20000, 500]),
             ],
-            # "Stage 2": [
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [100,200,1000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [150,250,1500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [200,300,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [250,350,2500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            #     EnemyType1(screen = screen, path = parabola_lane_normal, delay = [350,350,3500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
-            # ],
-            # "Stage 3" : [
-            #     EnemyType1(screen = screen, path = sinus_lane, delay = [100,200,1000]+[80 for _ in range(len(sinus_lane))]),
-            #     EnemyType1(screen = screen, path = sinus_lane, delay = [150,250,2500]+[80 for _ in range(len(sinus_lane))]),
-            #     EnemyType1(screen = screen, path = sinus_lane, delay = [200,300,3000]+[80 for _ in range(len(sinus_lane))]), 
-            #     EnemyType1(screen = screen, path = sinus_lane, delay = [250,350,3500]+[80 for _ in range(len(sinus_lane))]),
-            #     EnemyType1(screen = screen, path = sinus_lane, delay = [300,400,4000]+[80 for _ in range(len(sinus_lane))]),
-            # ],
-            # "Stage 4" : [
-            #     EnemyType2(screen = screen, path = [(901, 0), (901, 50)], delay = [1800, 3000]),
-            #     EnemyType2(screen = screen, path = [(800, 0), (800, 100)], delay = [1700, 4000]),
-            #     EnemyType2(screen = screen, path = [(700, 0), (700, 150)], delay = [1600, 4500]), 
-            #     EnemyType2(screen = screen, path = [(600, 0), (600, 100)], delay = [1700, 4000]),
-            #     EnemyType2(screen = screen, path = [(501, 0), (501, 50)], delay = [1800, 3000]),
-            # ],
+            "Stage 2": [
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [100,200,1000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [150,250,1500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [200,300,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [250,350,2500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [350,350,3500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+            ],
+            "Stage 3" : [
+                EnemyType1(screen = screen, path = sinus_lane, delay = [100,200,1000]+[80 for _ in range(len(sinus_lane))]),
+                EnemyType1(screen = screen, path = sinus_lane, delay = [150,250,2500]+[80 for _ in range(len(sinus_lane))]),
+                EnemyType1(screen = screen, path = sinus_lane, delay = [200,300,3000]+[80 for _ in range(len(sinus_lane))]), 
+                EnemyType1(screen = screen, path = sinus_lane, delay = [250,350,3500]+[80 for _ in range(len(sinus_lane))]),
+                EnemyType1(screen = screen, path = sinus_lane, delay = [300,400,4000]+[80 for _ in range(len(sinus_lane))]),
+            ],
+            "Stage 4" : [
+                EnemyType2(screen = screen, path = [(901, 0), (901, 50)], delay = [1800, 3000]),
+                EnemyType2(screen = screen, path = [(800, 0), (800, 100)], delay = [1700, 4000]),
+                EnemyType2(screen = screen, path = [(700, 0), (700, 150)], delay = [1600, 4500]), 
+                EnemyType2(screen = screen, path = [(600, 0), (600, 100)], delay = [1700, 4000]),
+                EnemyType2(screen = screen, path = [(501, 0), (501, 50)], delay = [1800, 3000]),
+            ],
             "delay": [1000, 10000, 5000, 3000]
         }
 
