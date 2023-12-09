@@ -1,6 +1,7 @@
 from .. import gameplay as gp
 
 class Player:
+    # initialisasi objek player
     def __init__(self, screen_width, screen_height, screen):
         """
             Kelas untuk merepresentasikan pemain dalam permainan.
@@ -79,8 +80,8 @@ class Player:
         self.damage = 24
         self.last_BasicAttack_time = 0
         self.last_RocketAttack_time = 0
-        self.shield = 50
-        self.max_shield = 50
+        self.shield = 1000
+        self.max_shield = 1000
         self.delay_basicAttack = 200
         self.delay_rocketAttack = 200
         self.regen_hp = 0.004
@@ -106,7 +107,7 @@ class Player:
             "SPACE": {"regen": {"active": False, "cooldown": 30000, "duration": 2000, "last_used": 0, "used": 0}}
         }
     
-    #  Memperbarui status player.
+    #  Memperbarui elemen milik player.
     def update(self):
         """Memperbarui status player."""
         
