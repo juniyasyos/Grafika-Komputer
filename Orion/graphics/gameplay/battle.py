@@ -115,19 +115,6 @@ class AttackActor(pygame.sprite.Sprite):
         if self.attack_type == "laser":
             self.update_laser()
 
-    def update_rocket(self):
-        """
-        Metode pembaruan khusus untuk serangan roket.
-        (Jika diperlukan implementasi khusus, ditambahkan di sini.)
-        """
-        pass
-
-    def update_laser(self):
-        """
-        Metode pembaruan khusus untuk serangan laser.
-        (Jika diperlukan implementasi khusus, ditambahkan di sini.)
-        """
-        pass
 
 
 # Kelas untuk mengelola pertempuran dalam permainan.
@@ -453,7 +440,7 @@ class Battle:
             if not ( enemy.rect.x <= self.screen_width and enemy.rect.y <= self.screen_height) :
                 self.enemies.remove(enemy)
             
-
+    # Mengatasi masalah tabrakan player maupun attack player
     def handle_attack_collision(self, enemy, attacks, attack):
         """Menangani serangan player dan efek ledakan."""
         enemy.health -= self.player.damage
@@ -466,11 +453,13 @@ class Battle:
             self.bullet_explosions.add(Explosion(x=x, y=y, explosion_images=explosions))
         attacks.remove(attack)
 
+    # Menangani score player dan juga bagaimana enemy meledak dan di hapus
     def handle_enemy_death(self, enemy):
         """Menangani ledakan dan menghapus musuh jika kesehatan habis."""
         self.player.score += 1
         self.enemies.remove(enemy)
 
+    # Menganani attack dari enemy
     def handle_enemy_attack(self, enemy):
         """Menangani serangan musuh terhadap player."""
         for attack in enemy.enemy_basic_attacks:
@@ -530,12 +519,14 @@ class Level:
         lane = list(zip(x_values, y_values))
         return lane
 
+    # Jalur berbentuk parabola
     def quarter_circle(self, center_x, center_y, radius, num_points=100):
         theta = np.linspace(0, np.pi / 2, num_points)
         x = center_x + radius * np.cos(theta)
         y = center_y + radius * np.sin(theta)
         return x, y
 
+    # Lajur lintasan berbentuk huruf l
     def l_shaped_formula(self, x):
         y = np.piecewise(x, [x <= 500, x > 500], [lambda x: 0, lambda x: np.sin((x - 500) * np.pi / 1000) * 500])
         return y

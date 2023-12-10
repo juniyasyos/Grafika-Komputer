@@ -42,7 +42,7 @@ class Basic_Attack_Normal_Enemy(pygame.sprite.Sprite):
         self.rect.center = actor.rect.center
     
 
-
+# class objeck attack special boss enemy
 class Spesial_Attack_Bos(pygame.sprite.Sprite):
     def __init__(self, x, y, angle, screen):
         super().__init__()
@@ -66,6 +66,7 @@ class Spesial_Attack_Bos(pygame.sprite.Sprite):
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color, (int(self.x), int(self.y)), self.radius)
+
 
 # class global enemy 
 class obj_Enemy(pygame.sprite.Sprite):
@@ -187,7 +188,6 @@ class obj_Enemy(pygame.sprite.Sprite):
                 else: 
                     return True
 
-
     def move_towards(self, target_x, target_y, speed):
         """
         Menggerakkan musuh menuju titik target dengan kecepatan tertentu.
@@ -220,7 +220,6 @@ class obj_Enemy(pygame.sprite.Sprite):
         # Memperbarui posisi rect (kotak batas) musuh
         self.rect.topleft = (int(self.x), int(self.y))
 
-    
     def draw_health(self, type_enemy="normal"):
         """Menampilkan indikator kesehatan musuh di layar."""
         
@@ -405,30 +404,6 @@ class EnemyType2(obj_Enemy):
 
 # class untuk bas musuh
 class EnemyBoss(obj_Enemy):
-    """
-    Representasi objek musuh tipe 1 dalam permainan.
-
-    Parameters:
-    - screen (Surface): Layar game.
-    - path (list): Jalur gerak musuh dalam bentuk koordinat.
-    - delay (list): Waktu delay sebelum musuh mulai bergerak dan pada setiap titik jalur.
-    - x (int): Koordinat x awal musuh.
-    - y (int): Koordinat y awal musuh.
-
-    Attributes:
-    - enemy_basic_attacks (Group): Grup basic attack musuh.
-    - health (int): Kesehatan musuh tipe 1.
-    - max_health (int): Kesehatan maksimum musuh tipe 1.
-    - basic_attack_speed (int): Kecepatan basic attack musuh tipe 1.
-
-    Methods:
-    - create_basic_attack_enemy(self, BasicAttack, enemy, current_time, last_time, cooldown_basicAttack):
-        Membuat basic attack musuh tipe 1.
-    - set_basicAttack_func(self):
-        Menetapkan fungsi untuk basic attack musuh tipe 1.
-    - update(self):
-        Memperbarui status musuh tipe 1.
-    """
     def __init__(self, screen, path, delay, x = None, y = None, speed = 1, size=260, health=300, damage=100, basic_attack_speed=5,delay_next_special_attack = 15000, special_attack_active = 3000, delay_next_basic_attack = 10000,basic_attack_active = 5000):
         """
         Inisialisasi objek musuh tipe 1.

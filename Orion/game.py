@@ -1,28 +1,11 @@
 import pygame
 import os
 import sys
-from icecream import ic
 from graphics.gameplay.view import Views
 
 os.environ['SDL_VIDEO-CENTERED'] = '1'
 
-
 class Game:
-    """
-    Kelas utama permainan.
-
-    Attributes:
-    - WIDTH (int): Lebar layar permainan.
-    - HEIGHT (int): Tinggi layar permainan.
-    - WINDOW_SIZE (tuple): Ukuran layar permainan.
-    - screen (Surface): Objek layar permainan.
-    - font (Font): Objek font untuk teks.
-    - Views (Views): Objek tampilan permainan.
-
-    Methods:
-    - __init__ (self): Inisialisasi objek permainan.
-    - rendering (self): Menjalankan loop rendering permainan.
-    """
     def __init__(self) -> None:
         pygame.init()
         pygame.mixer.init()

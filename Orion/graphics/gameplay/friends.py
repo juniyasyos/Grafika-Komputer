@@ -43,8 +43,6 @@ class Friends:
         self.basic_attack_sound = gp.pygame.mixer.Sound(gp.os.path.join(gp.os.path.dirname(gp.os.path.abspath(__file__)),"../resources/assets/Sound/Suara tembakan.mp3"))
         self.basic_attack_sound.set_volume(0.1)
 
-       
-    
     #  Memperbarui status friend.
     def update(self):
         """Memperbarui status friend."""
@@ -85,8 +83,6 @@ class Friends:
             if self.friend_win is False:
                 self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
                 self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
-
-
    
     # Menampilkan indikator kesehatan dan pelindung friend di layar
     def draw_health_bar(self):

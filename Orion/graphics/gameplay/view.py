@@ -17,6 +17,7 @@ def load_image(image_filename):
         print(f"Failed to load image: {image_filename}")
         raise e
 
+# object button dalam tampilan 
 class Button(gp.pygame.sprite.Sprite):
     def __init__(self, image, pos_x, pos_y, action, parameters=[]):
         """
@@ -49,7 +50,7 @@ class Button(gp.pygame.sprite.Sprite):
                     if gp.pygame.mouse.get_pressed()[0] == 1:
                         self.action[i](*self.parameters[i])
 
-
+# class untuk mengatur tampilan beranda, select lvl, page win dan lose player
 class Views:
     """
     Kelas untuk mengelola tampilan dalam permainan.
