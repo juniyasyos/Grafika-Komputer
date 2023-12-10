@@ -1,7 +1,8 @@
 from .. import gameplay as gp
 import sys
 import os
-from .battle import Level1, Level2, Level3
+from icecream import ic
+from .battle import Level1, Level2, Level3, Level4, Level5
 
 def load_image(image_filename):
     current_directory = os.path.dirname(os.path.abspath(__file__))  # Mengambil direktori saat ini
@@ -99,6 +100,29 @@ class Views:
         self.start_time = gp.pygame.time.get_ticks()
         self.start_time_index = 0
         self.Level_now = None
+        self.save_game = {
+            "lvl 1": 0,
+            "lvl 2": 0,
+            "lvl 3": 0,
+            "lvl 4": 0,
+            "lvl 5": 0
+        }
+        self.button_lock = load_image("../resources/assets/level select/level lock button.png")
+        self.button_level_save = {
+            "lvl 1" : {"button" : load_image("../resources/assets/level select/button lvl 1.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]},
+            "lvl 2" : {"button" : load_image("../resources/assets/level select/button lvl 2.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]},
+            "lvl 3" : {"button" : load_image("../resources/assets/level select/button lvl 3.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level3, [self.screen, self.screen_width, self.screen_height]]]},
+            "lvl 4" : {"button" : load_image("../resources/assets/level select/button lvl 4.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level4, [self.screen, self.screen_width, self.screen_height]]]},
+            "lvl 5" : {"button" : load_image("../resources/assets/level select/button lvl 5.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level5, [self.screen, self.screen_width, self.screen_height]]]}
+        }
+        
+        self.button_level_set = {
+            "lvl 1" : self.button_level_save["lvl 1"],
+            "lvl 2" : {"button":self.button_lock, "action":None, "parameters":None},
+            "lvl 3" : {"button":self.button_lock, "action":None, "parameters":None},
+            "lvl 4" : {"button":self.button_lock, "action":None, "parameters":None},
+            "lvl 5" : {"button":self.button_lock, "action":None, "parameters":None}
+        }
         
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.sound_files = {
@@ -130,39 +154,39 @@ class Views:
     def views_menu_lvl(self):
         data_buttons = {
             'btn_1':{
-                'image': load_image("../resources/assets/level select/button lvl 1.png"),
+                'image': self.button_level_set["lvl 1"]["button"],
                 'pos_x': self.screen_width // 4.2,
                 'pos_y': self.screen_height // 1.9 - 160,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'action': self.button_level_set["lvl 1"]["action"],
+                'parameters': self.button_level_set["lvl 1"]["parameters"]
             },
             'btn_2':{
-                'image': load_image("../resources/assets/level select/level lock button.png"),
+                'image': self.button_level_set["lvl 4"]["button"],
                 'pos_x': self.screen_width // 2.9,
                 'pos_y': self.screen_height // 1.7 - 70,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]
+                'action': self.button_level_set["lvl 4"]["action"],
+                'parameters': self.button_level_set["lvl 4"]["parameters"]
             },
             'btn_3':{
-                'image': load_image("../resources/assets/level select/button lvl 2.png"),
+                'image': self.button_level_set["lvl 2"]["button"],
                 'pos_x': self.screen_width // 2.2,
                 'pos_y': self.screen_height // 1.9 - 160,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'action': self.button_level_set["lvl 2"]["action"],
+                'parameters': self.button_level_set["lvl 2"]["parameters"]
             },
             'btn_4':{
-                'image': load_image("../resources/assets/level select/button lvl 3.png"),
+                'image': self.button_level_set["lvl 3"]["button"],
                 'pos_x': self.screen_width // 1.5,
                 'pos_y': self.screen_height // 1.9 - 160,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level3, [self.screen, self.screen_width, self.screen_height]]]
+                'action': self.button_level_set["lvl 3"]["action"],
+                'parameters': self.button_level_set["lvl 3"]["parameters"]
             },
             'btn_5':{
-                'image': load_image("../resources/assets/level select/level lock button.png"),
+                'image': self.button_level_set["lvl 5"]["button"],
                 'pos_x': self.screen_width // 1.8,
                 'pos_y': self.screen_height // 1.7 - 70,
-                'action': [self.set_path, self.set_Level],
-                'parameters': [["Battle"], [Level2, [self.screen, self.screen_width, self.screen_height]]]
+                'action': self.button_level_set["lvl 5"]["action"],
+                'parameters': self.button_level_set["lvl 5"]["parameters"]
             },
             'btn_play':{
                 'image': load_image("../resources/assets/level select/button play.png"),
@@ -308,17 +332,25 @@ class Views:
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
             condition = self.battle.run(self.start_time_index == 0)
-            self.start_time_index+=1
-            if condition is True:
-                self.set_background = self.background_page_player_win
-                self.path = "Player Win"
-                self.start_time_index = 0
-            elif condition is False:
-                self.set_background = self.background_page_player_lose
-                self.path = "Player Lose"
-                self.start_time_index = 0
-            else:
-                self.set_background = self.background_battle
+            ic(condition)
+            try:
+                if condition[0] is not None:
+                    self.start_time_index+=1
+                    if condition[0] is True:
+                        self.set_background = self.background_page_player_win
+                        self.path = "Player Win"
+                        self.set_level_button(condition[1])
+                        self.start_time_index = 0
+                        ic(self.save_game)
+                    elif condition[0] is False:
+                        self.set_background = self.background_page_player_lose
+                        self.path = "Player Lose"
+                        self.start_time_index = 0
+                else:
+                    self.set_background = self.background_battle
+            except Exception as e:
+                print('error',e)
+                
         elif self.path == "Player Win":
             self.page_player_win()
         elif self.path == "Player Lose":
@@ -399,6 +431,17 @@ class Views:
         - Level: Kelas level.
         - parameters (list): Daftar parameter level.
         """
+        if Level == Level1:
+            self.current_lvl = "lvl 1"
+        elif Level == Level2:
+            self.current_lvl = "lvl 2"
+        elif Level == Level3:
+            self.current_lvl = "lvl 3"
+        elif Level == Level4:
+            self.current_lvl = "lvl 4"
+        elif Level == Level5:
+            self.current_lvl = "lvl 5"
+        
         self.Level_now = Level
         self.battle = self.Level_now(*parameters)
         # merubah background battle sesuai dengan level
@@ -425,3 +468,14 @@ class Views:
             
         for sound in self.sound_files.values():
             sound.stop()
+    
+    def set_level_button(self, score):
+        button_level_save = self.button_level_save
+        button_level_set = self.button_level_set
+
+        if score >= self.save_game[self.current_lvl] or self.save_game[self.current_lvl] > 40:
+            self.save_game[self.current_lvl] = score
+            button_level_set[self.current_lvl] = button_level_save[self.current_lvl]
+        else:
+            button_level_set[self.current_lvl] = {"button": self.button_lock, "action": None, "parameters": None}
+

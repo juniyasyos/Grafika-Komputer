@@ -258,16 +258,16 @@ class Battle:
         if self.player.health <= 0: # Player lose
             finish_delay = 7000
             if self.handle_player_loss(current_time, finish_delay):
-                return False
+                return (False, None)
 
         elif self.stage_index >= len(self.stage):   # Player win
             finish_delay = 5000
             if self.handle_player_win(current_time, finish_delay):
-                return True
+                return (True, self.player.score)
             
         else:   # pertempuran belum berakhir
             self.handle_battle_continue(current_time)
-            return None
+            return (None, None)
 
     # Persiapan menuju stage selanjutnya
     def prepare_next_stage(self, current_time):
@@ -1149,7 +1149,24 @@ class Level4(Battle, Level):
                         (self.screen_height-200, 20)
                         ], 
                     delay = [1000, 23000, 15000, 23000, 20000, 20000, 23000, 15000, 23000, 1000],
-                    health=30000)
+                    health=30000),
+            
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10000,400]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10200,600]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10400,800]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10600,1000]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10800,1200]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [10000,1400]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20100,200,1000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20150,250,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20200,300,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20250,350,2500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20350,350,3500]+[50 for _ in range(len(parabola_lane_normal)-3)]),    
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20350,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [20400,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
             ],
             "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
         }
@@ -1159,4 +1176,149 @@ class Level4(Battle, Level):
 
 # Kelas untuk merepresentasian Level 5 dalam permainan (melawan bos stage 2)
 class Level5(Battle, Level):
-    pass
+    # initialisasi class level 1
+    def __init__(self, screen, screen_height, screen_width):
+        Level.__init__(self, screen_width, screen_height)
+        
+        # Background level
+        path_image_background = "../resources/assets/BG battle/bg 2.png"
+        
+        # >>> Rumus matematika yg digunakan untuk menentukan lajur enemy <<< #
+        # Setengah lingkaran 
+        bola_lane = self.quarter_circle(self.screen_height//4, self.screen_width//4, self.screen_height//2)
+        j_lane = self.generate_lane(self.l_shaped_formula)
+        j_lane = [(_[0]-200,_[1]-200) for _ in j_lane]
+        j_lane_left = j_lane.copy()
+        j_lane_right = [(self.screen_height-_[0],_[1]) for _ in j_lane.copy()]         
+        
+        # Garis Parabola
+        parabola = lambda x: 0.001 * (x - screen_width) ** 2 + 100
+        
+        # garis sinus
+        sinusoidal = lambda x: 50 * np.sin(0.02 * x) + 130
+        
+        # Implementasi dan persiapan lajur musuh
+        num_points = 150
+        parabola_lane_normal = self.generate_lane(parabola, num_points)
+        parabola_lane_reverse = parabola_lane_normal.copy()
+        parabola_lane_reverse.reverse()
+        
+        sinus_lane = self.generate_lane(sinusoidal, num_points)
+        
+        
+        stage = {
+            "Stage 1" : [
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [350,350,3500]+[50 for _ in range(len(parabola_lane_reverse)-3)]),    
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [300,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [350,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [400,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [450,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [500,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [550,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [600,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                
+                EnemyType2(screen = screen, path = [(901, -10), (1200, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(901, -10), (1100, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(901, -10), (1000, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(901, -10), (901, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(800, -10), (800, 50)], delay = [9700, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(800, -10), (800, 100)], delay = [9700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(700, -10), (700, 100)], delay = [9600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(700, -10), (700, 150)], delay = [9600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(700, -10), (700, 100)], delay = [9600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(600, -10), (600, 100)], delay = [9700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(600, -10), (600, 50)], delay = [9700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(501, -10), (501, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(501, -10), (401, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(501, -10), (401, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(501, -10), (301, 50)], delay = [9800, 4000], size=60, health=200, damage=70),
+            ],
+            "Stage 2": [
+                EnemyType1(screen = screen, path = j_lane_right, delay = [1000,400]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_right, delay = [1200,600]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_right, delay = [1400,800]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_right, delay = [1600,1000]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_right, delay = [1800,1200]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_right, delay = [2000,1400]+[70 for _ in range(len(j_lane_right))]+[3000]),
+                
+                EnemyType1(screen = screen, path = [(self.screen_height//2,0), (self.screen_height//2,0),((self.screen_height//2),100),((self.screen_height//2),0)], delay = [100, 600, 40000, 500], size=70, health=6000),
+                
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+200,140),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+300,120),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+400,100),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+500,80),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+600,60),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+200,140),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+300,120),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+400,100),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+500,80),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2)+600,60),((self.screen_height//2)-330,0)], delay = [100, 800, 40000, 500]),
+
+            ],
+            "Stage 3" : [
+                EnemyBoss(screen = screen, 
+                    path = [
+                        (self.screen_height//2-200, -50), 
+                        (self.screen_height//2-200, 20), 
+                        (self.screen_height-200, 20),
+                        (100, 20),
+                        (130, 10),
+                        (self.screen_height-230, 10),
+                        (self.screen_height//2-200, 20), 
+                        (130, 10),
+                        (100, 20),
+                        (self.screen_height-200, 20)
+                        ], 
+                    delay = [1000, 23000, 15000, 23000, 20000, 20000, 23000, 15000, 23000, 1000],
+                    health=40000, delay_next_special_attack=12000, special_attack_active=5000, delay_next_basic_attack=8000, basic_attack_active=7000),
+            
+                EnemyType1(screen = screen, path = [(0,100), (0,100),((self.screen_height//2-300),100),((self.screen_height//2)-250,0)], delay = [100, 600, 25000, 500], size=90, health=2000),
+                EnemyType1(screen = screen, path = [(self.screen_height//2,0), (self.screen_height//2,100),((self.screen_height//2),200),((self.screen_height//2)-250,0)], delay = [100, 600, 25000, 500], size=90, health=2000),
+                EnemyType1(screen = screen, path = [(self.screen_height,100), (self.screen_height,100),((self.screen_height//2+300),100),((self.screen_height//2)-250,0)], delay = [100, 600, 25000, 500], size=90, health=2000),
+            
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4000,400]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4200,600]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4400,800]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4600,1000]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4800,1200]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                EnemyType1(screen = screen, path = j_lane_left, delay = [4000,1400]+[100 for _ in range(len(j_lane_left))]+[3000]),
+                
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [100,200,1000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [150,250,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [200,300,2000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [250,350,2500]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [350,350,3500]+[50 for _ in range(len(parabola_lane_normal)-3)]),    
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [300,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [350,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [400,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [450,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [500,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [550,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_normal, delay = [600,300,3000]+[50 for _ in range(len(parabola_lane_normal)-3)]),
+
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10350,350,3500]+[50 for _ in range(len(parabola_lane_reverse)-3)]),    
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10300,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10350,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10400,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10450,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10500,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10550,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                EnemyType1(screen = screen, path = parabola_lane_reverse, delay = [10600,300,3000]+[50 for _ in range(len(parabola_lane_reverse)-3)]),
+                
+                EnemyType2(screen = screen, path = [(901, -10), (901, 50)], delay = [25800, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(800, -10), (800, 50)], delay = [25700, 4000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(800, -10), (800, 100)], delay = [25700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(700, -10), (700, 100)], delay = [25600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(700, -10), (700, 150)], delay = [25600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(700, -10), (700, 100)], delay = [25600, 5000], size=60, health=200, damage=70), 
+                EnemyType2(screen = screen, path = [(600, -10), (600, 100)], delay = [25700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(600, -10), (600, 50)], delay = [25700, 5000], size=60, health=200, damage=70),
+                EnemyType2(screen = screen, path = [(501, -10), (501, 50)], delay = [25800, 4000], size=60, health=200, damage=70),
+            ],
+            "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
+        }
+
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+    
