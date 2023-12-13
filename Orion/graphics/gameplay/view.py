@@ -101,13 +101,9 @@ class Views:
         self.start_time = gp.pygame.time.get_ticks()
         self.start_time_index = 0
         self.Level_now = None
-        self.save_game = {
-            "lvl 1": 0,
-            "lvl 2": 0,
-            "lvl 3": 0,
-            "lvl 4": 0,
-            "lvl 5": 0
-        }
+        
+        self.save_game = gp.load_from_json("../resources/save_data.json")
+        
         self.button_lock = load_image("../resources/assets/level select/level lock button.png")
         self.button_level_save = {
             "lvl 1" : {"button" : load_image("../resources/assets/level select/button lvl 1.png"), "action":[self.set_path, self.set_Level], "parameters":[["Battle"], [Level1, [self.screen, self.screen_width, self.screen_height]]]},
@@ -124,6 +120,7 @@ class Views:
             "lvl 4" : {"button":self.button_lock, "action":None, "parameters":None},
             "lvl 5" : {"button":self.button_lock, "action":None, "parameters":None}
         }
+        self.current_lvl = "lvl 1"
         
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.sound_files = {
@@ -279,7 +276,7 @@ class Views:
     # Menampilkan tampilan page player lose
     def page_player_lose(self):
         """
-                Menampilkan tampilan Views.
+            Menampilkan tampilan Views.
         """
         data_buttons = {
             'btn_home':{
@@ -318,6 +315,8 @@ class Views:
         self.screen_height = height
         self.screen_width = width
         
+        # print(self.save_data)
+        
         # Mengosongkan grup tombol
         self.buttons.empty()
 
@@ -329,21 +328,21 @@ class Views:
             self.Beranda()
             self.set_background = self.background_home
         elif self.path == "Views/Stage":
+            # set type button
+            self.load_level_button()
+            
             self.views_menu_lvl()
             self.set_background = self.background_select_lvl
         elif self.path == "Battle":
             condition = self.battle.run(self.start_time_index == 0)
-            ic(condition)
             try:
-                if condition[0] is not None:
+                if condition is not None:
                     self.start_time_index+=1
-                    if condition[0] is True:
+                    if condition is True:
                         self.set_background = self.background_page_player_win
                         self.path = "Player Win"
-                        self.set_level_button(condition[1])
                         self.start_time_index = 0
-                        ic(self.save_game)
-                    elif condition[0] is False:
+                    elif condition is False:
                         self.set_background = self.background_page_player_lose
                         self.path = "Player Lose"
                         self.start_time_index = 0
@@ -469,14 +468,15 @@ class Views:
             
         for sound in self.sound_files.values():
             sound.stop()
-    
-    def set_level_button(self, score):
+
+    # set button type
+    def load_level_button(self):
+        self.save_data = gp.load_from_json("../resources/save_data.json")
         button_level_save = self.button_level_save
         button_level_set = self.button_level_set
-
-        if score >= self.save_game[self.current_lvl] or self.save_game[self.current_lvl] > 40:
-            self.save_game[self.current_lvl] = score
-            button_level_set[self.current_lvl] = button_level_save[self.current_lvl]
-        else:
-            button_level_set[self.current_lvl] = {"button": self.button_lock, "action": None, "parameters": None}
-
+        
+        for data in self.save_data:
+            if int(self.save_data[data][0]) >= 1000 or self.save_data[data][1] == "True":
+                button_level_set[data] = button_level_save[data]
+            else:
+                button_level_set[data] = {"button": self.button_lock, "action": None, "parameters": None}

@@ -25,9 +25,9 @@ class Basic_Attack_Normal_Enemy(pygame.sprite.Sprite):
         - image (Surface): Gambar serangan.
         - attack_type (str): Jenis serangan.
         - func (function): Fungsi khusus terkait serangan.
-        - rect (Rect): Area persegi panjang yang mengelilingi gambar serangan,
+        - rect (Rect): Area persegi panjang yang mengelilingi gambar serangan.
           diatur pada posisi awal aktor.
-        """
+    """
         
     def __init__(self, screen, actor, speed, image, attack_type="basic", func = None, target_position=(0,0)):
         super().__init__()
@@ -181,9 +181,9 @@ class obj_Enemy(pygame.sprite.Sprite):
                     self.move_towards(target_x, target_y, self.speed)
             
             else:
-                if enemy_type == "normal":
+                if self.enemy_type == "normal":
                     self.kill()
-                elif enemy_type == "Boss":
+                elif self.enemy_type == "Boss":
                     self.path_index = 1
                 else: 
                     return True
@@ -404,7 +404,7 @@ class EnemyType2(obj_Enemy):
 
 # class untuk bas musuh
 class EnemyBoss(obj_Enemy):
-    def __init__(self, screen, path, delay, x = None, y = None, speed = 1, size=260, health=300, damage=100, basic_attack_speed=5,delay_next_special_attack = 15000, special_attack_active = 3000, delay_next_basic_attack = 10000,basic_attack_active = 5000):
+    def __init__(self, screen, path, delay, x = None, y = None, speed = 1, size=260, health=300, damage=100, basic_attack_speed=5,delay_next_special_attack = 5000, special_attack_active = 3000, delay_next_basic_attack = 10000,basic_attack_active = 5000):
         """
         Inisialisasi objek musuh tipe 1.
 

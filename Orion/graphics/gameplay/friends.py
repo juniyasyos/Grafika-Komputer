@@ -14,8 +14,8 @@ class Friends:
         self.font = gp.pygame.font.Font(None, 36)
 
         # Set initial position
-        self.rect.centerx = screen_width // 2 + 50  # Menambah 50 pixel ke posisi awal x
-        self.rect.bottom = screen_height - 10
+        self.rect.centerx = screen_width // 2 + 90  # Menambah 50 pixel ke posisi awal x
+        self.rect.bottom = screen_height + 100
 
         # Friends attributes
         self.speed = 10
@@ -33,8 +33,7 @@ class Friends:
         self.type_basicAttack = "type_1"
         self.basic_attack_speed = 15
         self.friend_rocket_attacks = gp.pygame.sprite.Group()
-        self.friend_basic_attacks_type1 = [gp.pygame.sprite.Group() for i in range(1)]
-        self.friend_basic_attacks_type2 = [gp.pygame.sprite.Group() for i in range(2)]
+        self.friend_basic_attacks = [gp.pygame.sprite.Group() for i in range(1)]
         self.available_basic_attacks = []
         self.friend_win = False
         self.handle_option = True
@@ -54,7 +53,6 @@ class Friends:
         self.handle_events()
         self.draw_health_bar()
         self.draw_score()
-        self.draw_icon_skill()
         
         # Mengatur fungsi basic attack dan menampilkan friend di layar
         self.set_basicAttack_func()
@@ -88,14 +86,11 @@ class Friends:
     def draw_health_bar(self):
         """Menampilkan indikator kesehatan dan pelindung friend di layar."""
         
-        # Menentukan warna dan nilai yang akan ditampilkan berdasarkan kondisi pelindung friend
-        color = ["green", "cyan"] if self.skills["4"]["shield"]["active"] and self.shield >= 0 else ["red", "green"]
-        show = [self.shield, self.max_shield] if self.skills["4"]["shield"]["active"] and self.shield >= 0 else [self.health, self.max_health]
-        
+
         # Menggambar indikator kesehatan dan pelindung
-        gp.pygame.draw.rect(self.screen, color[0], (self.rect.x, self.rect.y - 10, self.rect.width, 5))
-        current_health_width = (show[0] / show[1]) * self.rect.width
-        gp.pygame.draw.rect(self.screen, color[1], (self.rect.x, self.rect.y - 10, current_health_width, 5))
+        gp.pygame.draw.rect(self.screen, "cyan", (self.rect.x, self.rect.y - 10, self.rect.width, 5))
+        current_health_width = (self.health / self.max_health) * self.rect.width
+        gp.pygame.draw.rect(self.screen, "green", (self.rect.x, self.rect.y - 10, current_health_width, 5))
 
     # Menampilkan skor friend di layar.
     def draw_score(self):
@@ -128,26 +123,6 @@ class Friends:
             
             # Memperbarui waktu terakhir basic attack
             self.last_BasicAttack_time = self.current_time
-        
-   
-    # Menampilkan ikon dan cooldown skill di layar.
-    def draw_icon_skill(self):
-        """Menampilkan ikon dan cooldown skill di layar."""
-        
-        # Iterasi melalui semua skill dan menampilkan ikon serta cooldown
-        for i, (skill_key, skill_data) in enumerate(self.skills.items(), start=1):
-            for skill_name, skill_info in skill_data.items():
-                
-                # Menghitung cooldown dan memastikan nilainya tidak kurang dari 0
-                calculate_cooldown = lambda skill_info, current_time: max(0, ((skill_info["last_used"] - self.current_time) + skill_info["cooldown"]) // 1000) if skill_info["used"] != 0 else 0
-                cooldown = calculate_cooldown(skill_info, self.current_time)
-
-                # Menggambar area untuk menampilkan ikon dan cooldown
-                gp.pygame.draw.rect(self.screen, "white", [10, 70 + i * 60, 150, 50])
-                
-                # Menampilkan teks dengan informasi skill dan cooldown
-                text = self.font.render(f"{skill_name}: {cooldown}", True, "black")
-                self.screen.blit(text, (10, 80 + i * 60))
 
     # Menetapkan fungsi untuk menampilkan basic attack friend di layar.
     def set_basicAttack_func(self):
@@ -163,8 +138,3 @@ class Friends:
         if len(self.friend_basic_attacks) > 0:
             for attacks in range(len(self.friend_basic_attacks)):
                 bullet_move(self.friend_basic_attacks[attacks], offset_x=(20*attacks)-(10*len(self.friend_basic_attacks)//(attacks+1)))
-
-        # Menampilkan basic attack friend yang masih tersedia
-        if len(self.available_basic_attacks) > 0:
-            for attacks in range(len(self.available_basic_attacks)):
-                bullet_move(self.available_basic_attacks[attacks], offset_x=(20*attacks)-(10*len(self.available_basic_attacks)//(attacks+1)))

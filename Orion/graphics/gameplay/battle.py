@@ -4,6 +4,7 @@ from .. import gameplay as gp
 import pygame
 import os
 import random
+from .friends import Friends
 import numpy as np
 
 # class objek ledakan.
@@ -120,7 +121,7 @@ class AttackActor(pygame.sprite.Sprite):
 # Kelas untuk mengelola pertempuran dalam permainan.
 class Battle:
     # Initialisasi objeck dalam battle
-    def __init__(self, screen, screen_width, screen_height, image_background, stage):
+    def __init__(self, screen, screen_width, screen_height, image_background, stage, level_path, next_level):
         """
         Kelas untuk mengelola pertempuran dalam permainan.
 
@@ -181,6 +182,8 @@ class Battle:
         self.next_stage_delay = 0
         self.path_image_background = image_background   
         self.stage = stage
+        self.level_path = level_path
+        self.next_level = next_level
         
         # Elemen Suara
         current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -192,7 +195,15 @@ class Battle:
         }
         for sound in self.sound_files.values():
             sound.set_volume(0.3)
-        
+    
+    def save_data(self):
+        save_data = gp.load_from_json("../resources/save_data.json")
+        if self.player.score >= 10:
+            print("masuk")
+            save_data[self.level_path][0] = self.player.score
+            save_data[self.next_level][1] = "True"
+            gp.save_to_json("../resources/save_data.json", save_data)
+    
     # Animasi perubahan transparansi layar menjadi hitam.
     def fade_animation(self):
         """
@@ -245,16 +256,16 @@ class Battle:
         if self.player.health <= 0: # Player lose
             finish_delay = 7000
             if self.handle_player_loss(current_time, finish_delay):
-                return (False, None)
+                return False
 
         elif self.stage_index >= len(self.stage):   # Player win
             finish_delay = 5000
             if self.handle_player_win(current_time, finish_delay):
-                return (True, self.player.score)
+                self.save_data()
+                return True
             
         else:   # pertempuran belum berakhir
             self.handle_battle_continue(current_time)
-            return (None, None)
 
     # Persiapan menuju stage selanjutnya
     def prepare_next_stage(self, current_time):
@@ -387,9 +398,6 @@ class Battle:
             enemy.enemy_basic_attacks = pygame.sprite.Group(
                 [attack for attack in enemy.enemy_basic_attacks if attack.rect.y < self.screen_height]
             )
-            # menghapus musuh yang keluar dari layar dan mengecek apakah type musuh merupakan bos atau bukan
-            if (0 > enemy.rect.x > self.screen_width) or (0 > enemy.rect.y > self.screen_height) and enemy.type_enemy != "Boss":
-                enemy.kill()
 
     # Mengecek dan membuat serangan dasar baik dari player maupun musuh.
     def cek_actor_attack(self):
@@ -456,7 +464,7 @@ class Battle:
     # Menangani score player dan juga bagaimana enemy meledak dan di hapus
     def handle_enemy_death(self, enemy):
         """Menangani ledakan dan menghapus musuh jika kesehatan habis."""
-        self.player.score += 1
+        self.player.score += 10
         self.enemies.remove(enemy)
 
     # Menganani attack dari enemy
@@ -551,6 +559,8 @@ class Level1(Battle, Level):
     
     # initialisasi class level 1
     def __init__(self, screen, screen_height, screen_width):
+        level_path = "lvl 1"
+        next_level = "lvl 2"
         Level.__init__(self, screen_width, screen_height)
         
         # Background level
@@ -570,7 +580,7 @@ class Level1(Battle, Level):
         
         stage = {
             "Stage 1": [
-                EnemyType1(screen = screen, path = [(901, 0), (901, 50), (screen_width, 100)], delay = [1800, 20000, 500]),
+                EnemyType1(screen = screen, path = [(901, 0), (901, 50), (screen_width, 100)], delay = [1800, 20000, 1000]),
                 EnemyType1(screen = screen, path = [(800, 0), (800, 100), (screen_width, 150)], delay = [1700, 20000, 1000]),
                 EnemyType1(screen = screen, path = [(700, 0), (700, 150), (screen_width, 200)], delay = [1600, 20000, 1500]), 
                 EnemyType1(screen = screen, path = [(600, 0), (600, 100), (screen_width, 250)], delay = [1700, 20000, 1000]),
@@ -600,7 +610,7 @@ class Level1(Battle, Level):
             ],
             "delay": [1000, 10000, 5000, 3000]
         }
-        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage, level_path, next_level)
 
 
 # Kelas untuk merepresentasikan Level 2 dalam permainan.
@@ -622,6 +632,8 @@ class Level2(Battle, Level):
         
     # initialisasi class level 2
     def __init__(self, screen, screen_height, screen_width):
+        level_path = "lvl 2"
+        next_level = "lvl 3"
         Level.__init__(self, screen_width, screen_height)
         
         # Background level
@@ -752,7 +764,7 @@ class Level2(Battle, Level):
             "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000]
         }
 
-        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage, level_path, next_level)
     
     
 # Kelas untuk merepresentasikan Level 3 dalam permainan.
@@ -774,6 +786,8 @@ class Level3(Battle, Level):
     
     # initialisasi class level 1
     def __init__(self, screen, screen_height, screen_width):
+        level_path = "lvl 3"
+        next_level = "lvl 4"
         Level.__init__(self, screen_width, screen_height)
         
         # Background level
@@ -1001,7 +1015,7 @@ class Level3(Battle, Level):
             "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
         }
 
-        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage, level_path, next_level)
     
     
 # Kelas untuk merepresentasian Level 4 dalam permainan (melawan bos stage 1)
@@ -1009,6 +1023,8 @@ class Level4(Battle, Level):
     
     # initialisasi class level 1
     def __init__(self, screen, screen_height, screen_width):
+        level_path = "lvl 4"
+        next_level = "lvl 5"
         Level.__init__(self, screen_width, screen_height)
         
         # Background level
@@ -1162,13 +1178,15 @@ class Level4(Battle, Level):
             "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
         }
 
-        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage, level_path, next_level)
 
 
 # Kelas untuk merepresentasian Level 5 dalam permainan (melawan bos stage 2)
 class Level5(Battle, Level):
     # initialisasi class level 1
     def __init__(self, screen, screen_height, screen_width):
+        level_path = "lvl 5"
+        next_level = None
         Level.__init__(self, screen_width, screen_height)
         
         # Background level
@@ -1311,5 +1329,5 @@ class Level5(Battle, Level):
             "delay": [1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000]
         }
 
-        super().__init__(screen, screen_height, screen_width, path_image_background, stage)
+        super().__init__(screen, screen_height, screen_width, path_image_background, stage, level_path, next_level)
     
